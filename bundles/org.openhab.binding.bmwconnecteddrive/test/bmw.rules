@@ -1,0 +1,106 @@
+// Hybrid and Electric Range Radius plus Vehicle Coordinates
+rule "LocationRangeChange"
+	when
+        System started or
+        Item i3Latitude changed or
+		Item i3Longitude changed or
+		Item i3RangeRadiusElectric changed or
+        Item i3RangeRadiusHybrid changed
+	then
+        // Electric Range Radius & Vehicle Coordinates
+        val latitudeNumber = i3Latitude.state as Number
+        val longitudeNumber = i3Longitude.state as Number
+        i3LatLongElectric.sendCommand(latitudeNumber.floatValue+","+longitudeNumber.floatValue)
+        val radiusElectricNumber = i3RadiusElectric.state as Number
+        i3RadiusElectricMeter.sendCommand(radiusElectricNumber.intValue * 1000)
+        
+        // Hybrid Range Radius & Vehicle Coordinates
+        i3LatLongHybrid.sendCommand(latitudeNumber.floatValue +","+longitudeNumber.floatValue)
+        val radiusHybridNumber = i3RadiusHybrid.state as Number
+        logInfo("Rage Map","Radius Hybrid"+radiusHybridNumber.intValue)
+        i3RadiusHybridMeter.sendCommand(radiusHybridNumber.intValue * 1000)    
+end
+
+// Coordinates of the last 3 Destinations
+rule "Destinations"
+	when
+        System started or
+        Item i3Dest1Lat changed or
+        Item i3Dest1Lon changed or
+        Item i3Dest2Lat changed or
+        Item i3Dest2Lon changed or
+        Item i3Dest3Lat changed or
+        Item i3Dest3Lon changed        
+ 	then                                                    
+        val lat1N = i3Dest1Lat.state as Number
+        val lon1N = i3Dest1Lon.state as Number
+        i3Dest1LatLon.sendCommand(lat1N.floatValue +","+lon1N.floatValue)
+ 
+        val lat2N = i3Dest2Lat.state as Number
+        val lon2N = i3Dest2Lon.state as Number
+        i3Dest2LatLon.sendCommand(lat2N.floatValue +","+lon2N.floatValue)
+
+        val lat3N = i3Dest3Lat.state as Number
+        val lon3N = i3Dest3Lon.state as Number
+        i3Dest3LatLon.sendCommand(lat3N.floatValue +","+lon3N.floatValue)
+end
+
+// App Notification if Check Control Message is active
+rule "CheckControl"
+	when
+        System started or
+        Item i3CheckControl changed 
+ 	then
+        if(i3CheckControl.state.toString != "Ok" && i3CheckControl.state.toString != "NULL") {
+            sendNotification("YOUR_MYOPENHAB_CLOUD_MAIL_ADRESS","i3 Check Control: "+i3CheckControl.state)
+        }                                                    
+end
+
+// Cron for Service observation
+rule "Service"
+    when
+        System started or
+        Time cron "0 0 9 ? * MON *"
+    then
+        val DateTime dt = new DateTime(i3ServiceDate.state.toString)
+        val Number daysToService = (dt.getMillis - now.millis) / 1000 / 60 / 60 / 24
+        if(daysToService < 30) {
+            logInfo("Service Date","Time to schedule Service")
+                sendNotification("YOUR_MYOPENHAB_CLOUD_MAIL_ADRESS", i3ServiceName.state.toString + " Service required in " + daysToService + " days")
+        } else {
+            logInfo("Service Date","{} days to {} Service left ",daysToService,i3ServiceName.state.toString)
+        }
+end
+
+// Change Image according to Vehicle Status
+rule "Image Status"
+    when
+        System started or
+        Item i3ChargingStatus changed or
+        Item i3Latitude changed or
+		Item i3Longitude changed or
+        Item i3CheckControl changed or
+        Item i3LockStatus changed
+    then
+        if(i3ChargingStatus.state.toString == "Charging") {
+            logInfo("Vehicle Image","Charging")
+            i3ImageViewport.sendCommand("SIDE")
+        } else if(i3LockStatus.state.toString != "Secured") {
+            logInfo("Vehicle Image","Doors not locked")
+            i3ImageViewport.sendCommand("DRIVERDOOR")
+        } else if(i3CheckControl.state.toString != "Ok") {
+            logInfo("Vehicle Image","Check Control Active")
+            i3ImageViewport.sendCommand("DASHBOARD")
+        } else {
+            val latitudeNumber = i3Latitude.state as Number
+            val longitudeNumber = i3Longitude.state as Number
+            // Home Location Range - insert your Home Latitude / Longitude ranges
+            if((1.23 < latitudeNumber.floatValue) && ( latitudeNumber.floatValue < 1.24) && (3.21 < longitudeNumber.floatValue) && (longitudeNumber.floatValue < 3.22) ) {
+                logInfo("Vehicle Image","Home Location")
+                i3ImageViewport.sendCommand("FRONT")
+            } else {
+                logInfo("Vehicle Image","Vehicle is away")
+                i3ImageViewport.sendCommand("REAR")
+            }    
+        }
+end

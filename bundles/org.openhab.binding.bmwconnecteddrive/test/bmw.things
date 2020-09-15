@@ -1,0 +1,3 @@
+Bridge bmwconnecteddrive:account:user   "BMW ConnectedDrive Account" [userName="YOUR_USERNAME",password="YOUR_PASSWORD",region="ROW"] {
+    	 Thing BEV_REX i3		"BMW i3 94h REX"				[ vin="YOUR_VEHICLE_VIN",units="AUTODETECT",imageSize=1024,imageViewport="FRONT",refreshInterval=5]
+}
