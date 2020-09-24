@@ -1,0 +1,8 @@
+// Range Radius Items
+String          i3LatLongElectric      "Location String"
+Number          i3RadiusElectricMeter  "Electric Range Radius"
+String          i3LatLongHybrid        "Location String"
+Number          i3RadiusHybridMeter    "Hybrid Range Radius"
+
+//Destination Items
+String          mapDestination         "Destination"

@@ -1,0 +1,113 @@
+sitemap BMW label="BMW" {
+  Frame label="BMW i3" {
+    Image  item=i3Image                     
+  } 
+  Frame label="Range" {
+    Text    item=i3Mileage           
+    Text    item=i3Range             
+    Text    item=i3RangeElectric     
+    Text    item=i3RangeFuel         
+    Text    item=i3BatterySoc        
+    Text    item=i3Fuel              
+    Text    item=i3RadiusElectric       
+    Text    item=i3RadiusHybrid         
+  }
+  Frame label="Status" {
+    Text    item=i3DoorStatus           
+    Text    item=i3WindowStatus         
+    Text    item=i3LockStatus           
+    Text    item=i3NextServiceDate              
+    Text    item=i3NextServiceMileage       
+    Text    item=i3CheckControl         
+    Text    item=i3ChargingStatus           
+    Text    item=i3LastUpdate               
+  }
+  Frame label="Remote Services" {
+    Switch  item=i3RemoteFlash              
+    Switch  item=i3RemoteFinder            
+    Switch  item=i3RemoteLock               
+    Switch  item=i3RemoteUnlock             
+    Switch  item=i3RemoteHorn               
+    Switch  item=i3RemoteClimate            
+    Text    item=i3RemoteState              
+  }
+  Frame label="Last Trip" {
+    Text    item=i3TripDateTime            
+    Text    item=i3TripDuration            
+    Text    item=i3TripDistance            
+    Text    item=i3TripDistanceSinceCharge 
+    Text    item=i3AvgTripConsumption      
+    Text    item=i3AvgTripRecuperation     
+    Text    item=i3AvgTripCombined     
+  }
+  Frame label="Lifetime" {
+    Text    item=i3CumulatedElectric  
+    Text    item=i3LongestEVTrip      
+    Text    item=i3AvgConsumption     
+    Text    item=i3AvgRecuperation          
+    Text    item=i3AvgCombined          
+  }
+  Frame label="Services" {
+    Text    item=i3ServiceName          
+    Text    item=i3ServiceMileage          
+    Text    item=i3ServiceDate          
+    Text    item=i3ServiceCount          
+    Text    item=i3ServiceIndex          
+    Switch  item=i3NextService            
+  }
+  Frame label="CheckControl" {
+    Text    item=i3CCName          
+    Text    item=i3CCMileage          
+    Text    item=i3CCCount          
+    Text    item=i3CCIndex          
+    Switch  item=i3CCNext            
+  }
+  Frame label="Door Details" {
+    Text    item=i3DriverDoor
+    Text    item=i3DriverDoorRear  
+    Text    item=i3PassengerDoor 
+    Text    item=i3PassengerDoorRear 
+    Text    item=i3Hood 
+    Text    item=i3Trunk
+    Text    item=i3DriverWindow
+    Text    item=i3DriverWindowRear 
+    Text    item=i3PassengerWindow 
+    Text    item=i3PassengerWindowRear 
+    Text    item=i3RearWindow 
+    Text    item=i3Sunroof 
+  }
+  Frame label="Location" {
+    Text    item=i3Latitude           
+    Text    item=i3Longitude          
+    Text    item=i3Heading             
+  }
+  Frame label="Charge Profile" {    
+    Switch  item=i3ChargeProfileClimate     
+    Text    item=i3ChargeProfileMode        
+    Text    item=i3ChargeWindowStart        
+    Text    item=i3ChargeWindowEnd          
+    Text    item=i3Timer1Departure          
+    Text    item=i3Timer1Days               
+    Switch  item=i3Timer1Enabled            
+    Text    item=i3Timer2Departure          
+    Text    item=i3Timer2Days               
+    Switch  item=i3Timer2Enabled            
+    Text    item=i3Timer3Departure          
+    Text    item=i3Timer3Days               
+    Switch  item=i3Timer3Enabled            
+  } 
+  Frame label="Last Destinations" {    
+    Text  item=i3DestName                 
+    Text  item=i3DestLat                                                                                   
+    Text  item=i3DestLon                                                                                    
+    Text  item=i3DestCount                 
+    Text  item=i3DestIndex                                                                                        
+    Switch  item=i3DestNext                                                                                        
+  }  
+  Frame label="Troubleshooting & Image Properties" {
+    Text    item=i3ImageViewport
+    Text    item=i3ImageSize 
+    Switch  item=i3DiscoveryTroubleshoot    
+    Switch  item=i3Troubleshoot             
+  } 
+}

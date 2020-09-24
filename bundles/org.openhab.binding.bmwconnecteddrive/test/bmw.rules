@@ -1,0 +1,101 @@
+// Hybrid and Electric Range Radius plus Vehicle Coordinates
+rule "LocationRangeChange"
+	when
+        System started or
+        Item i3Latitude changed or
+    		Item i3Longitude changed or
+	    	Item i3RangeRadiusElectric changed or
+        Item i3RangeRadiusHybrid changed
+	then
+        // Electric Range Radius & Vehicle Coordinates
+        val latitudeNumber = i3Latitude.state as Number
+        val longitudeNumber = i3Longitude.state as Number
+        i3LatLongElectric.sendCommand(latitudeNumber.floatValue+","+longitudeNumber.floatValue)
+        val radiusElectricNumber = i3RadiusElectric.state as Number
+        i3RadiusElectricMeter.sendCommand(radiusElectricNumber.intValue * 1000)
+        
+        // Hybrid Range Radius & Vehicle Coordinates
+        i3LatLongHybrid.sendCommand(latitudeNumber.floatValue +","+longitudeNumber.floatValue)
+        val radiusHybridNumber = i3RadiusHybrid.state as Number
+        logInfo("Rage Map","Radius Hybrid"+radiusHybridNumber.intValue)
+        i3RadiusHybridMeter.sendCommand(radiusHybridNumber.intValue * 1000)    
+end
+
+// Changes Coordinates to the current selected Destination List Item
+rule "Destinations"
+	when
+        Item i3DestIndex changed   
+ 	then   
+        val lat = i3DestLat.state as Number
+        val lon = i3DestLon.state as Number
+        mapDestination.sendCommand(lat.floatValue +","+lon.floatValue) 
+end
+
+// App Notification if Check Control Message is active
+rule "CheckControl"
+	when
+        System started or
+        Item i3CCCount changed 
+ 	then
+        val count = i3CCCount.state as Number
+        if(count.intValue > 0) {
+            sendNotification("YOUR_OPENHAB_MAIL","i3 Check Control: "+i3CCName.state)
+        }                                                    
+end
+
+// Cron for Service observation
+rule "Service"
+    when
+        System started or
+        Time cron "0 0 9 ? * MON *"
+    then
+        val DateTime dt = new DateTime(i3NextServiceDate.state.toString)
+        val Number daysToService = (dt.getMillis - now.millis) / 1000 / 60 / 60 / 24
+        if(daysToService < 30) {
+            logInfo("Service Date","Time to schedule Service")
+                sendNotification("YOUR_OPENHAB_MAIL", "Service required in " + daysToService + " days")
+        } else {
+            logInfo("Service Date","{} days to Service left ",daysToService)
+        }
+end
+
+// Change Image according to Vehicle Status
+rule "Image Status"
+    when
+        System started or
+        Item i3ChargingStatus changed or
+        Item i3Latitude changed or
+		Item i3Longitude changed or
+        Item i3CheckControl changed or
+        Item i3LockStatus changed
+    then
+        if(i3ChargingStatus.state.toString == "Charging") {
+            logInfo("Vehicle Image","Charging")
+            i3ImageViewport.sendCommand("SIDE")
+        } else if( (i3LockStatus.state.toString != "Secured") && (i3LockStatus.state.toString != "Locked") ) {
+            logInfo("Vehicle Image","Doors not locked")
+            i3ImageViewport.sendCommand("DRIVERDOOR")
+        } else if(i3CheckControl.state.toString == "Active") {
+            logInfo("Vehicle Image","Check Control Active")
+            i3ImageViewport.sendCommand("DASHBOARD")
+        } else {
+            val latitudeNumber = i3Latitude.state as Number
+            val longitudeNumber = i3Longitude.state as Number
+            // Home Location Range - insert your Home Latitude / Longitude ranges
+            if((1.23 < latitudeNumber.floatValue) && ( latitudeNumber.floatValue < 1.24) && (3.21 < longitudeNumber.floatValue) && (longitudeNumber.floatValue < 3.22) ) {
+                logInfo("Vehicle Image","Home Location")
+                i3ImageViewport.sendCommand("FRONT")
+            } else {
+                logInfo("Vehicle Image","Vehicle is away")
+                i3ImageViewport.sendCommand("REAR")
+            }    
+        }
+end
+
+// Change Image based on Location and Status
+// rule "Image Status"
+//     when
+//         System started
+//     then
+//         i3CheckControl.sendCommand("Tire Pressure")
+// end
