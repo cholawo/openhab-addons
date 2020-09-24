@@ -91,11 +91,3 @@ rule "Image Status"
             }    
         }
 end
-
-// Change Image based on Location and Status
-// rule "Image Status"
-//     when
-//         System started
-//     then
-//         i3CheckControl.sendCommand("Tire Pressure")
-// end
