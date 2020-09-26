@@ -134,7 +134,11 @@ public class ConnectedDriveProxy {
                     NetworkError error = new NetworkError();
                     error.url = completeUrl.toString();
                     error.status = result.getResponse().getStatus();
-                    error.reason = result.getResponse().getReason();
+                    if (result.getResponse().getReason() != null) {
+                        error.reason = result.getResponse().getReason();
+                    } else {
+                        error.reason = result.getFailure().getMessage();
+                    }
                     error.params = result.getRequest().getParams().toString();
                     logger.debug("HTTP Error {}", error.toString());
                     callback.onError(error);
@@ -163,6 +167,11 @@ public class ConnectedDriveProxy {
 
     public void requestVehcileStatus(VehicleConfiguration config, StringResponseCallback callback) {
         get(new StringBuffer(baseUrl).append(config.vin).append(vehicleStatusAPI).toString(), Optional.empty(),
+                callback);
+    }
+
+    public void requestOldVehcileStatus(VehicleConfiguration vehicleConfiguration, StringResponseCallback callback) {
+        get("https://b2vapi.bmwgroup.com/api/vehicle/dynamic/v1/" + vehicleConfiguration.vin, Optional.empty(),
                 callback);
     }
 

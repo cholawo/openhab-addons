@@ -94,6 +94,7 @@ public class VehicleHandler extends VehicleChannelHandler {
     private ImageProperties imageProperties = new ImageProperties();
 
     VehicleStatusCallback vehicleStatusCallback = new VehicleStatusCallback();
+    StringResponseCallback oldVehicleStatusCallback = new OldVehicleStatusCallback();
     StringResponseCallback lastTripCallback = new LastTripCallback();
     StringResponseCallback allTripsCallback = new AllTripsCallback();
     StringResponseCallback chargeProfileCallback = new ChargeProfilesCallback();
@@ -393,6 +394,7 @@ public class VehicleHandler extends VehicleChannelHandler {
     public void getData() {
         if (proxy.isPresent() && configuration.isPresent()) {
             proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
+            proxy.get().requestOldVehcileStatus(configuration.get(), oldVehicleStatusCallback);
             if (isSupported(Constants.STATISTICS)) {
                 proxy.get().requestLastTrip(configuration.get(), lastTripCallback);
                 proxy.get().requestAllTrips(configuration.get(), allTripsCallback);
@@ -898,6 +900,19 @@ public class VehicleHandler extends VehicleChannelHandler {
             logger.debug("{}", error.toString());
             vehicleStatusCache = Optional.of(Converter.getGson().toJson(error));
             setThingStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, error.reason);
+        }
+    }
+
+    @NonNullByDefault({})
+    public class OldVehicleStatusCallback implements StringResponseCallback {
+        @Override
+        public void onResponse(Optional<String> content) {
+            logger.warn("/api/vehicle/dynamic/v1/ {}", content.get());
+        }
+
+        @Override
+        public void onError(NetworkError error) {
+            logger.warn("/api/vehicle/dynamic/v1/ {}", error.toJson());
         }
     }
 }
