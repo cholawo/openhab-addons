@@ -906,6 +906,7 @@ public class VehicleHandler extends VehicleChannelHandler {
             if (error.status == 404) {
                 compatibilityMode = true;
                 logger.debug("VehicleStatus not found - switch to old API");
+                proxy.get().requestOldVehcileStatus(configuration.get(), oldVehicleStatusCallback);
             }
             vehicleStatusCache = Optional.of(Converter.getGson().toJson(error));
             setThingStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, error.reason);
