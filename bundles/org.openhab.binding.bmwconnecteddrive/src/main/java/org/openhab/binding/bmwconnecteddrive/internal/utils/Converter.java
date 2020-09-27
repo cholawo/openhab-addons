@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -32,13 +33,17 @@ public class Converter {
     public static final DateTimeFormatter SERVICE_DATE_INPUT_PATTERN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter SERVICE_DATE_OUTPUT_PATTERN = DateTimeFormatter.ofPattern("MMM yyyy");
 
+    public static final String LOCAL_DATE_INPUT_PATTERN_STRING = "dd.MM.yyyy HH:mm";
+    public static final DateTimeFormatter LOCAL_DATE_INPUT_PATTERN = DateTimeFormatter
+            .ofPattern(LOCAL_DATE_INPUT_PATTERN_STRING);
+
     public static final String DATE_INPUT_PATTERN_STRING = "yyyy-MM-dd'T'HH:mm:ss";
-    public static final String DATE_INPUT_ZONE_PATTERN_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final DateTimeFormatter DATE_INPUT_PATTERN = DateTimeFormatter.ofPattern(DATE_INPUT_PATTERN_STRING);
+
+    public static final String DATE_INPUT_ZONE_PATTERN_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final DateTimeFormatter DATE_INPUT_ZONE_PATTERN = DateTimeFormatter
             .ofPattern(DATE_INPUT_ZONE_PATTERN_STRING);
-    public static final DateTimeFormatter DATE_TIMEZONE_INPUT_PATTERN = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+
     public static final DateTimeFormatter DATE_OUTPUT_PATTERN = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private static final Gson GSON = new Gson();
@@ -57,7 +62,11 @@ public class Converter {
         if (input.contains(Constants.PLUS)) {
             ldt = LocalDateTime.parse(input, Converter.DATE_INPUT_ZONE_PATTERN);
         } else {
-            ldt = LocalDateTime.parse(input, Converter.DATE_INPUT_PATTERN);
+            try {
+                ldt = LocalDateTime.parse(input, Converter.DATE_INPUT_PATTERN);
+            } catch (DateTimeParseException dtpe) {
+                ldt = LocalDateTime.parse(input, Converter.LOCAL_DATE_INPUT_PATTERN);
+            }
         }
         ZonedDateTime zdtUTC = ldt.atZone(ZoneId.of("UTC"));
         ZonedDateTime zdtLZ = zdtUTC.withZoneSameInstant(ZoneId.systemDefault());
@@ -123,7 +132,7 @@ public class Converter {
      * @param range
      * @return mapping from air-line distance to "real road" distance
      */
-    public static double guessRangeRadius(float range) {
+    public static double guessRangeRadius(double range) {
         return range * 0.8;
     }
 }

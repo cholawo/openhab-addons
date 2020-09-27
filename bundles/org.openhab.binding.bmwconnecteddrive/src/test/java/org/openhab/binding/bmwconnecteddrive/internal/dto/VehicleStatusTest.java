@@ -18,11 +18,13 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.Test;
+import org.openhab.binding.bmwconnecteddrive.internal.dto.compat.VehicleAttributesContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.CBSMessage;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.Position;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatus;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatusContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.util.FileReader;
+import org.openhab.binding.bmwconnecteddrive.internal.utils.Converter;
 
 import com.google.gson.Gson;
 
@@ -58,5 +60,19 @@ public class VehicleStatusTest {
         assertEquals("Service Mileage ", 15345, message.cbsRemainingMileage);
         message = services.get(1);
         assertEquals("Service Mileage ", -1, message.cbsRemainingMileage);
+    }
+
+    @Test
+    public void testCompatibility() {
+        String resource = FileReader.readFileInString("src/test/resources/api/vehicle/vehicle-ccm.json");
+        VehicleAttributesContainer vac = GSON.fromJson(resource, VehicleAttributesContainer.class);
+        // String s = vac.transform();
+        // System.out.println(s);
+        assertEquals("CCM", "Laden nicht möglich", vac.vehicleMessages.ccmMessages.get(0).text);
+        // Time
+        VehicleStatusContainer vsc = GSON.fromJson(vac.transform(), VehicleStatusContainer.class);
+        assertEquals("UTC DateTime", "27.09.2020 13:18", vsc.vehicleStatus.getUpdateTime());
+        String ldt = Converter.getLocalDateTime(vsc.vehicleStatus.getUpdateTime());
+        assertEquals("Local DateTime", "2020-09-27T15:18:00", ldt.toString());
     }
 }

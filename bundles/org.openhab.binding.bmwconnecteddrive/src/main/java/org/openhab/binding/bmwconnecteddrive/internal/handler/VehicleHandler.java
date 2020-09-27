@@ -51,6 +51,7 @@ import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.ChargeProfile;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.ChargingWindow;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.Timer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.WeeklyPlanner;
+import org.openhab.binding.bmwconnecteddrive.internal.dto.compat.VehicleAttributesContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTrips;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTripsContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.LastTrip;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class VehicleHandler extends VehicleChannelHandler {
     private final Logger logger = LoggerFactory.getLogger(VehicleHandler.class);
+    private boolean compatibilityMode = false; // switch to old API in case of 404 Errors
 
     private Optional<ConnectedDriveProxy> proxy = Optional.empty();
     private Optional<RemoteServiceHandler> remote = Optional.empty();
@@ -393,8 +395,11 @@ public class VehicleHandler extends VehicleChannelHandler {
 
     public void getData() {
         if (proxy.isPresent() && configuration.isPresent()) {
-            proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
-            proxy.get().requestOldVehcileStatus(configuration.get(), oldVehicleStatusCallback);
+            if (!compatibilityMode) {
+                proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
+            } else {
+                proxy.get().requestOldVehcileStatus(configuration.get(), oldVehicleStatusCallback);
+            }
             if (isSupported(Constants.STATISTICS)) {
                 proxy.get().requestLastTrip(configuration.get(), lastTripCallback);
                 proxy.get().requestAllTrips(configuration.get(), allTripsCallback);
@@ -898,6 +903,10 @@ public class VehicleHandler extends VehicleChannelHandler {
         @Override
         public void onError(NetworkError error) {
             logger.debug("{}", error.toString());
+            if (error.status == 404) {
+                compatibilityMode = true;
+                logger.debug("VehicleStatus not found - switch to old API");
+            }
             vehicleStatusCache = Optional.of(Converter.getGson().toJson(error));
             setThingStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, error.reason);
         }
@@ -907,12 +916,16 @@ public class VehicleHandler extends VehicleChannelHandler {
     public class OldVehicleStatusCallback implements StringResponseCallback {
         @Override
         public void onResponse(Optional<String> content) {
-            logger.warn("/api/vehicle/dynamic/v1/ {}", content.get());
+            if (content.isPresent()) {
+                VehicleAttributesContainer vac = Converter.getGson().fromJson(content.get(),
+                        VehicleAttributesContainer.class);
+                vehicleStatusCallback.onResponse(Optional.of(vac.transform()));
+            }
         }
 
         @Override
         public void onError(NetworkError error) {
-            logger.warn("/api/vehicle/dynamic/v1/ {}", error.toJson());
+            logger.debug("{}", error.toString());
         }
     }
 }
