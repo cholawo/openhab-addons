@@ -14,8 +14,6 @@ package org.openhab.binding.bmwconnecteddrive.internal.handler;
 
 import static org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConstants.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -23,16 +21,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.library.types.RawType;
 import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.library.unit.ImperialUnits;
-import org.eclipse.smarthome.core.library.unit.MetricPrefix;
-import org.eclipse.smarthome.core.library.unit.SIUnits;
-import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -42,27 +34,17 @@ import org.eclipse.smarthome.core.thing.binding.BridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
-import org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConstants.VehicleType;
 import org.openhab.binding.bmwconnecteddrive.internal.VehicleConfiguration;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.Destination;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.DestinationContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.NetworkError;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.ChargeProfile;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.ChargingWindow;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.Timer;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.WeeklyPlanner;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.compat.VehicleAttributesContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTrips;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTripsContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.LastTrip;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.LastTripContainer;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.status.CBSMessage;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.status.CCMMessage;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.status.Doors;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.status.Position;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatus;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatusContainer;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.status.Windows;
 import org.openhab.binding.bmwconnecteddrive.internal.handler.RemoteServiceHandler.ExecutionState;
 import org.openhab.binding.bmwconnecteddrive.internal.handler.RemoteServiceHandler.RemoteService;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.Constants;
@@ -88,11 +70,6 @@ public class VehicleHandler extends VehicleChannelHandler {
     private Optional<ConnectedDriveBridgeHandler> bridgeHandler = Optional.empty();
     private Optional<ScheduledFuture<?>> refreshJob = Optional.empty();
 
-    private boolean imperial = false;
-    private boolean hasFuel = false;
-    private boolean isElectric = false;
-    private boolean isHybrid = false;
-
     private ImageProperties imageProperties = new ImageProperties();
 
     VehicleStatusCallback vehicleStatusCallback = new VehicleStatusCallback();
@@ -105,13 +82,7 @@ public class VehicleHandler extends VehicleChannelHandler {
     ByteResponseCallback imageCallback = new ImageCallback();
 
     public VehicleHandler(Thing thing, HttpClient hc, String type, boolean imperial) {
-        super(thing);
-        this.imperial = imperial;
-        hasFuel = type.equals(VehicleType.CONVENTIONAL.toString()) || type.equals(VehicleType.PLUGIN_HYBRID.toString())
-                || type.equals(VehicleType.ELECTRIC_REX.toString());
-        isElectric = type.equals(VehicleType.PLUGIN_HYBRID.toString())
-                || type.equals(VehicleType.ELECTRIC_REX.toString()) || type.equals(VehicleType.ELECTRIC.toString());
-        isHybrid = hasFuel && isElectric;
+        super(thing, type, imperial);
     }
 
     @Override
@@ -208,31 +179,33 @@ public class VehicleHandler extends VehicleChannelHandler {
         }
         if (channelUID.getIdWithoutGroup().equals(NEXT)) {
             String gUid = channelUID.getGroupId();
-            switch (gUid) {
-                case CHANNEL_GROUP_SERVICE:
-                    if (command instanceof OnOffType) {
-                        if (command.equals(OnOffType.ON)) {
-                            vehicleStatusCallback.nextService();
-                            updateState(channelUID, OnOffType.OFF);
+            if (gUid != null) {
+                switch (gUid) {
+                    case CHANNEL_GROUP_SERVICE:
+                        if (command instanceof OnOffType) {
+                            if (command.equals(OnOffType.ON)) {
+                                nextService();
+                                updateState(channelUID, OnOffType.OFF);
+                            }
                         }
-                    }
-                    break;
-                case CHANNEL_GROUP_DESTINATION:
-                    if (command instanceof OnOffType) {
-                        if (command.equals(OnOffType.ON)) {
-                            destinationCallback.next();
-                            updateState(channelUID, OnOffType.OFF);
+                        break;
+                    case CHANNEL_GROUP_DESTINATION:
+                        if (command instanceof OnOffType) {
+                            if (command.equals(OnOffType.ON)) {
+                                nextDestination();
+                                updateState(channelUID, OnOffType.OFF);
+                            }
                         }
-                    }
-                    break;
-                case CHANNEL_GROUP_CHECK_CONTROL:
-                    if (command instanceof OnOffType) {
-                        if (command.equals(OnOffType.ON)) {
-                            vehicleStatusCallback.nextCheckControl();
-                            updateState(channelUID, OnOffType.OFF);
+                        break;
+                    case CHANNEL_GROUP_CHECK_CONTROL:
+                        if (command instanceof OnOffType) {
+                            if (command.equals(OnOffType.ON)) {
+                                nextCheckControl();
+                                updateState(channelUID, OnOffType.OFF);
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         }
         if (channelUID.getIdWithoutGroup().equals(VEHICLE_FINGERPRINT)) {
@@ -469,28 +442,7 @@ public class VehicleHandler extends VehicleChannelHandler {
             chargeProfileCache = content;
             if (content.isPresent()) {
                 ChargeProfile cp = Converter.getGson().fromJson(content.get(), ChargeProfile.class);
-                WeeklyPlanner planner = cp.weeklyPlanner;
-                updateState(chargeProfileClimate, OnOffType.from(planner.climatizationEnabled));
-                updateState(chargeProfileChargeMode, StringType.valueOf(Converter.toTitleCase(planner.chargingMode)));
-
-                ChargingWindow cw = planner.preferredChargingWindow;
-                updateState(chargeWindowStart, StringType.valueOf(cw.startTime));
-                updateState(chargeWindowEnd, StringType.valueOf(cw.endTime));
-
-                Timer t1 = planner.timer1;
-                updateState(timer1Departure, StringType.valueOf(t1.departureTime));
-                updateState(timer1Enabled, OnOffType.from(t1.timerEnabled));
-                updateState(timer1Days, StringType.valueOf(t1.getDays()));
-
-                Timer t2 = planner.timer2;
-                updateState(timer2Departure, StringType.valueOf(t2.departureTime));
-                updateState(timer2Enabled, OnOffType.from(t2.timerEnabled));
-                updateState(timer2Days, StringType.valueOf(t2.getDays()));
-
-                Timer t3 = planner.timer3;
-                updateState(timer3Departure, StringType.valueOf(t3.departureTime));
-                updateState(timer3Enabled, OnOffType.from(t3.timerEnabled));
-                updateState(timer3Days, StringType.valueOf(t3.getDays()));
+                updateChargeProfile(cp);
             }
         }
 
@@ -523,34 +475,6 @@ public class VehicleHandler extends VehicleChannelHandler {
 
     @NonNullByDefault({})
     public class DestinationsCallback implements StringResponseCallback {
-        private List<Destination> destinations = new ArrayList<Destination>();
-        private int destinationIndexSelected = -1;
-
-        public void next() {
-            destinationIndexSelected++;
-            updateDestination();
-        }
-
-        /**
-         * needs to be synchronized with onResponse update
-         */
-        private synchronized void updateDestination() {
-            if (destinations != null) {
-                updateState(destinationSize, new DecimalType(destinations.size()));
-                if (!destinations.isEmpty()) {
-                    if (destinationIndexSelected < 0 || destinationIndexSelected >= destinations.size()) {
-                        // select first item
-                        destinationIndexSelected = 0;
-                    }
-                    Destination entry = destinations.get(destinationIndexSelected);
-                    updateState(destinationName, StringType.valueOf(entry.getAddress()));
-                    updateState(destinationLat, new DecimalType(entry.lat));
-                    updateState(destinationLon, new DecimalType(entry.lon));
-                    // last update index - this is a sync point and you're sure that all data is valid noew
-                    updateState(destinationIndex, new DecimalType(destinationIndexSelected));
-                }
-            }
-        }
 
         @Override
         public void onResponse(Optional<String> content) {
@@ -559,10 +483,7 @@ public class VehicleHandler extends VehicleChannelHandler {
                 DestinationContainer dc = Converter.getGson().fromJson(content.get(), DestinationContainer.class);
 
                 if (dc.destinations != null) {
-                    synchronized (this) {
-                        destinations = dc.destinations;
-                        updateDestination();
-                    }
+                    setDestinationList(dc.destinations);
                 }
             }
         }
@@ -610,23 +531,11 @@ public class VehicleHandler extends VehicleChannelHandler {
         public void onResponse(Optional<String> content) {
             if (content.isPresent()) {
                 allTripsCache = content;
-                AllTripsContainer at = Converter.getGson().fromJson(content.get(), AllTripsContainer.class);
-                AllTrips c = at.allTrips;
-                if (c == null) {
-                    return;
+                AllTripsContainer atc = Converter.getGson().fromJson(content.get(), AllTripsContainer.class);
+                AllTrips at = atc.allTrips;
+                if (at != null) {
+                    updateAllTrips(at);
                 }
-                updateState(lifeTimeCumulatedDrivenDistance, QuantityType
-                        .valueOf(Converter.round(c.totalElectricDistance.userTotal), MetricPrefix.KILO(SIUnits.METRE)));
-                updateState(lifeTimeSingleLongestDistance, QuantityType
-                        .valueOf(Converter.round(c.chargecycleRange.userHigh), MetricPrefix.KILO(SIUnits.METRE)));
-                updateState(lifeTimeAverageConsumption, QuantityType
-                        .valueOf(Converter.round(c.avgElectricConsumption.userAverage), SmartHomeUnits.KILOWATT_HOUR));
-                updateState(lifetimeAvgCombinedConsumption,
-                        QuantityType.valueOf(c.avgCombinedConsumption.userAverage, SmartHomeUnits.LITRE));
-                updateState(lifeTimeAverageRecuperation, QuantityType
-                        .valueOf(Converter.round(c.avgRecuperation.userAverage), SmartHomeUnits.KILOWATT_HOUR));
-                updateState(tripDistanceSinceCharging, QuantityType.valueOf(
-                        Converter.round(c.chargecycleRange.userCurrentChargeCycle), MetricPrefix.KILO(SIUnits.METRE)));
             }
         }
 
@@ -648,19 +557,9 @@ public class VehicleHandler extends VehicleChannelHandler {
                 lastTripCache = content;
                 LastTripContainer lt = Converter.getGson().fromJson(content.get(), LastTripContainer.class);
                 LastTrip trip = lt.lastTrip;
-                if (trip == null) {
-                    return;
+                if (trip != null) {
+                    updateLastTrip(trip);
                 }
-                updateState(tripDateTime, DateTimeType.valueOf(Converter.getLocalDateTime(trip.date)));
-                updateState(tripDuration, QuantityType.valueOf(trip.duration, SmartHomeUnits.MINUTE));
-                updateState(tripDistance,
-                        QuantityType.valueOf(Converter.round(trip.totalDistance), MetricPrefix.KILO(SIUnits.METRE)));
-                updateState(tripAvgConsumption, QuantityType.valueOf(Converter.round(trip.avgElectricConsumption),
-                        SmartHomeUnits.KILOWATT_HOUR));
-                updateState(tripAvgCombinedConsumption,
-                        QuantityType.valueOf(trip.avgCombinedConsumption, SmartHomeUnits.LITRE));
-                updateState(tripAvgRecuperation,
-                        QuantityType.valueOf(Converter.round(trip.avgRecuperation), SmartHomeUnits.KILOWATT_HOUR));
             }
         }
 
@@ -680,10 +579,6 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class VehicleStatusCallback implements StringResponseCallback {
         private ThingStatus thingStatus = ThingStatus.UNKNOWN;
-        private List<CBSMessage> services = new ArrayList<CBSMessage>();
-        private int serviceIndexSelected = -1;
-        private List<CCMMessage> checkControls = new ArrayList<CCMMessage>();
-        private int checkControlIndex = -1;
 
         /**
          * Vehicle Status is supported by all Vehicles so callback result is used to report Thing Status.
@@ -699,67 +594,6 @@ public class VehicleHandler extends VehicleChannelHandler {
             }
         }
 
-        public void nextCheckControl() {
-            checkControlIndex++;
-            updateService();
-        }
-
-        public void nextService() {
-            serviceIndexSelected++;
-            updateService();
-        }
-
-        private synchronized void updateCheckControls() {
-            if (checkControls != null) {
-                updateState(checkControlSize, new DecimalType(checkControls.size()));
-                if (!checkControls.isEmpty()) {
-                    if (checkControlIndex < 0 || checkControlIndex >= checkControls.size()) {
-                        // select first item
-                        checkControlIndex = 0;
-                    }
-                    CCMMessage entry = checkControls.get(checkControlIndex);
-                    updateState(checkControlName, StringType.valueOf(entry.ccmDescriptionShort));
-                    if (imperial) {
-                        updateState(checkControlMileage,
-                                QuantityType.valueOf(Converter.round(entry.ccmMileage), ImperialUnits.MILE));
-                    } else {
-                        updateState(checkControlMileage, QuantityType.valueOf(Converter.round(entry.ccmMileage),
-                                MetricPrefix.KILO(SIUnits.METRE)));
-                    }
-                    // last update index - this is a sync point and you're sure that all data is valid noew
-                    updateState(VehicleHandler.this.checkControlIndex, new DecimalType(checkControlIndex));
-                }
-
-            }
-        }
-
-        /**
-         * needs to be synchronized with onResponse update
-         */
-        private synchronized void updateService() {
-            if (services != null) {
-                updateState(serviceSize, new DecimalType(services.size()));
-                if (!services.isEmpty()) {
-                    if (serviceIndexSelected < 0 || serviceIndexSelected >= services.size()) {
-                        // select first item
-                        serviceIndexSelected = 0;
-                    }
-                    CBSMessage entry = services.get(serviceIndexSelected);
-                    updateState(serviceDate, DateTimeType.valueOf(Converter.getLocalDateTime(entry.getDueDate())));
-                    if (imperial) {
-                        updateState(serviceMileage,
-                                QuantityType.valueOf(Converter.round(entry.cbsRemainingMileage), ImperialUnits.MILE));
-                    } else {
-                        updateState(serviceMileage, QuantityType.valueOf(Converter.round(entry.cbsRemainingMileage),
-                                MetricPrefix.KILO(SIUnits.METRE)));
-                    }
-                    updateState(serviceName, StringType.valueOf(Converter.toTitleCase(entry.getType())));
-                    // last update index - this is a sync point and you're sure that all data is valid noew
-                    updateState(serviceIndex, new DecimalType(serviceIndexSelected));
-                }
-            }
-        }
-
         @Override
         public void onResponse(Optional<String> content) {
             if (content.isPresent()) {
@@ -771,132 +605,10 @@ public class VehicleHandler extends VehicleChannelHandler {
                 if (vStatus == null) {
                     return;
                 }
-
-                // Vehicle Status
-                updateState(lock, StringType.valueOf(Converter.toTitleCase(vStatus.doorLockState)));
-                Doors doorState = Converter.getGson().fromJson(Converter.getGson().toJson(vStatus), Doors.class);
-                updateState(doors, StringType.valueOf(VehicleStatus.checkClosed(doorState)));
-
-                updateState(doorDriverFront, StringType.valueOf(doorState.doorDriverFront));
-                updateState(doorDriverRear, StringType.valueOf(doorState.doorDriverRear));
-                updateState(doorPassengerFront, StringType.valueOf(doorState.doorPassengerFront));
-                updateState(doorPassengerRear, StringType.valueOf(doorState.doorPassengerRear));
-                updateState(doorTrunk, StringType.valueOf(doorState.trunk));
-                updateState(doorHood, StringType.valueOf(doorState.hood));
-
-                Windows windowState = Converter.getGson().fromJson(Converter.getGson().toJson(vStatus), Windows.class);
-                updateState(windows, StringType.valueOf(VehicleStatus.checkClosed(windowState)));
-
-                updateState(windowDriverFront, StringType.valueOf(windowState.windowDriverFront));
-                updateState(windowDriverRear, StringType.valueOf(windowState.windowDriverRear));
-                updateState(windowPassengerFront, StringType.valueOf(windowState.windowPassengerFront));
-                updateState(windowPassengerRear, StringType.valueOf(windowState.windowPassengerRear));
-                updateState(windowRear, StringType.valueOf(windowState.rearWindow));
-                updateState(windowSunroof, StringType.valueOf(windowState.sunroof));
-
-                // Service Updates
-                String nextServiceDate = vStatus.getNextServiceDate();
-                if (!nextServiceDate.equals(Constants.NULL_DATE)) {
-                    updateState(serviceNextDate, DateTimeType.valueOf(Converter.getLocalDateTime(nextServiceDate)));
-                }
-                double nextServiceMileage = vStatus.getNextServiceMileage();
-                if (imperial) {
-                    updateState(serviceNextMileage,
-                            QuantityType.valueOf(Converter.round(nextServiceMileage), ImperialUnits.MILE));
-                } else {
-                    updateState(serviceNextMileage, QuantityType.valueOf(Converter.round(nextServiceMileage),
-                            MetricPrefix.KILO(SIUnits.METRE)));
-                }
-
-                // synchronize with commands
-                synchronized (this) {
-                    services = vStatus.cbsData;
-                    updateService();
-                }
-                updateState(checkControl, StringType.valueOf(Converter.toTitleCase(vStatus.checkControlActive())));
-                synchronized (this) {
-                    checkControls = vStatus.checkControlMessages;
-                    updateCheckControls();
-                }
-
-                // Range values
-                // based on unit of length decide if range shall be reported in km or miles
-                if (!imperial) {
-                    updateState(mileage, QuantityType.valueOf(vStatus.mileage, MetricPrefix.KILO(SIUnits.METRE)));
-                    float totalRange = 0;
-                    if (isElectric) {
-                        totalRange += vStatus.remainingRangeElectric;
-                        updateState(remainingRangeElectric,
-                                QuantityType.valueOf(vStatus.remainingRangeElectric, MetricPrefix.KILO(SIUnits.METRE)));
-                        updateState(rangeRadiusElectric,
-                                QuantityType.valueOf(Converter.guessRangeRadius(vStatus.remainingRangeElectric),
-                                        MetricPrefix.KILO(SIUnits.METRE)));
-                    }
-                    if (hasFuel) {
-                        totalRange += vStatus.remainingRangeFuel;
-                        updateState(remainingRangeFuel,
-                                QuantityType.valueOf(vStatus.remainingRangeFuel, MetricPrefix.KILO(SIUnits.METRE)));
-                        updateState(rangeRadiusFuel,
-                                QuantityType.valueOf(Converter.guessRangeRadius(vStatus.remainingRangeFuel),
-                                        MetricPrefix.KILO(SIUnits.METRE)));
-                    }
-                    if (isHybrid) {
-                        updateState(remainingRangeHybrid,
-                                QuantityType.valueOf(Converter.round(totalRange), MetricPrefix.KILO(SIUnits.METRE)));
-                        updateState(rangeRadiusHybrid, QuantityType.valueOf(Converter.guessRangeRadius(totalRange),
-                                MetricPrefix.KILO(SIUnits.METRE)));
-                    }
-                } else {
-                    updateState(mileage, QuantityType.valueOf(vStatus.mileage, ImperialUnits.MILE));
-                    float totalRange = 0;
-                    if (isElectric) {
-                        totalRange += vStatus.remainingRangeElectricMls;
-                        updateState(remainingRangeElectric,
-                                QuantityType.valueOf(vStatus.remainingRangeElectricMls, ImperialUnits.MILE));
-                        updateState(rangeRadiusElectric, QuantityType.valueOf(
-                                Converter.guessRangeRadius(vStatus.remainingRangeElectricMls), ImperialUnits.MILE));
-                    }
-                    if (hasFuel) {
-                        totalRange += vStatus.remainingRangeFuelMls;
-                        updateState(remainingRangeFuel,
-                                QuantityType.valueOf(vStatus.remainingRangeFuelMls, ImperialUnits.MILE));
-                        updateState(rangeRadiusFuel, QuantityType.valueOf(
-                                Converter.guessRangeRadius(vStatus.remainingRangeFuelMls), ImperialUnits.MILE));
-                    }
-                    if (isHybrid) {
-                        updateState(remainingRangeHybrid,
-                                QuantityType.valueOf(Converter.round(totalRange), ImperialUnits.MILE));
-                        updateState(rangeRadiusHybrid,
-                                QuantityType.valueOf(Converter.guessRangeRadius(totalRange), ImperialUnits.MILE));
-                    }
-                }
-                if (isElectric) {
-                    updateState(remainingSoc, QuantityType.valueOf(vStatus.chargingLevelHv, SmartHomeUnits.PERCENT));
-                }
-                if (hasFuel) {
-                    updateState(remainingFuel, QuantityType.valueOf(vStatus.remainingFuel, SmartHomeUnits.LITRE));
-                }
-                // last update Time
-                updateState(lastUpdate, DateTimeType.valueOf(Converter.getLocalDateTime(vStatus.getUpdateTime())));
-
-                // Charge Values
-                if (isElectric) {
-                    if (vStatus.chargingStatus != null) {
-                        if (Constants.INVALID.equals(vStatus.chargingStatus)) {
-                            updateState(chargingStatus,
-                                    StringType.valueOf(Converter.toTitleCase(vStatus.lastChargingEndReason)));
-                        } else {
-                            // State INVALID is somehow misleading. Instead show the Last Charging End Reason
-                            updateState(chargingStatus,
-                                    StringType.valueOf(Converter.toTitleCase(vStatus.chargingStatus)));
-                        }
-                    }
-                }
-
-                Position p = vStatus.position;
-                updateState(latitude, new DecimalType(p.lat));
-                updateState(longitude, new DecimalType(p.lon));
-                updateState(heading, QuantityType.valueOf(p.heading, SmartHomeUnits.DEGREE_ANGLE));
+                updateVehicleStatus(vStatus);
+                setCheckControlList(vStatus.checkControlMessages);
+                setServiceList(vStatus.cbsData);
+                updatePosition(vStatus.position);
             }
         }
 
@@ -913,6 +625,17 @@ public class VehicleHandler extends VehicleChannelHandler {
         }
     }
 
+    /**
+     * Fallback API if origin isn't supported.
+     * This comes from the Community Discussion where a Vehicle from 2015 answered with "404"
+     * https://community.openhab.org/t/bmw-connecteddrive-binding/105124
+     *
+     * Selection of API was discussed here
+     * https://community.openhab.org/t/bmw-connecteddrive-bmw-i3/103876
+     *
+     * I figured out that only one API was working for this Vehicle. So this backward compatible Callback is introduced.
+     * The delivered data is converted into the origin dto object so no changes in previous functional code needed
+     */
     @NonNullByDefault({})
     public class OldVehicleStatusCallback implements StringResponseCallback {
         @Override
@@ -926,7 +649,7 @@ public class VehicleHandler extends VehicleChannelHandler {
 
         @Override
         public void onError(NetworkError error) {
-            logger.debug("{}", error.toString());
+            vehicleStatusCallback.onError(error);
         }
     }
 }
