@@ -11,7 +11,7 @@ String                  i3DoorStatus              "Door Status [%s]"            
 String                  i3WindowStatus            "Window Status [%s]"                          <lock>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#windows" }
 String                  i3LockStatus              "Lock Status [%s]"                            <lock>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#lock" }
 DateTime                i3NextServiceDate         "Next Service Date [%1$tb %1$tY]"             <calendar>      (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#service-date" }
-String                  i3NextServiceMileage      "Next Service Mileage [%d %unit%]"            <line>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#service-mileage" }
+Number:Length           i3NextServiceMileage      "Next Service Mileage [%d %unit%]"            <line>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#service-mileage" }
 String                  i3CheckControl            "Check Control [%s]"                          <error>         (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#check-control" }
 String                  i3ChargingStatus          "Charging [%s]"                               <energy>        (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#charge" } 
 DateTime                i3LastUpdate              "Update [%1$tA, %1$td.%1$tm. %1$tH:%1$tM]"    <calendar>      (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:status#last-update"}
