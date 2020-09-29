@@ -125,10 +125,18 @@ public class StatusWrapper {
                         assertEquals("Mileage", qt.intValue(), vStatus.mileage);
                         break;
                     case CHANNEL_GROUP_SERVICE:
-                        assertEquals("Mileage", qt.intValue(), vStatus.cbsData.get(0).cbsRemainingMileage);
+                        if (vStatus.cbsData.isEmpty()) {
+                            assertEquals("Mileage", qt.intValue(), -1);
+                        } else {
+                            assertEquals("Mileage", qt.intValue(), vStatus.cbsData.get(0).cbsRemainingMileage);
+                        }
                         break;
                     case CHANNEL_GROUP_CHECK_CONTROL:
-                        assertEquals("Mileage", qt.intValue(), vStatus.checkControlMessages.get(0).ccmMileage);
+                        if (vStatus.checkControlMessages.isEmpty()) {
+                            assertEquals("Mileage", qt.intValue(), -1);
+                        } else {
+                            assertEquals("Mileage", qt.intValue(), vStatus.checkControlMessages.get(0).ccmMileage);
+                        }
                         break;
                     default:
                         assertFalse("Channel " + channelUID + " " + state + " not found", true);
@@ -390,10 +398,18 @@ public class StatusWrapper {
                 dt = (DecimalType) state;
                 switch (gUid) {
                     case CHANNEL_GROUP_SERVICE:
-                        assertEquals("Index of Services", 0, dt.intValue());
+                        if (vStatus.cbsData.isEmpty()) {
+                            assertEquals("Index of Services", -1, dt.intValue());
+                        } else {
+                            assertEquals("Index of Services", 0, dt.intValue());
+                        }
                         break;
                     case CHANNEL_GROUP_CHECK_CONTROL:
-                        assertEquals("Index of CheckControls", 0, dt.intValue());
+                        if (vStatus.checkControlMessages.isEmpty()) {
+                            assertEquals("Index of CheckControls", -1, dt.intValue());
+                        } else {
+                            assertEquals("Index of CheckControls", 0, dt.intValue());
+                        }
                         break;
                     default:
                         assertFalse("Channel " + channelUID + " " + state + " not found", true);
@@ -445,11 +461,17 @@ public class StatusWrapper {
                 st = (StringType) state;
                 switch (gUid) {
                     case CHANNEL_GROUP_SERVICE:
-                        wanted = StringType.valueOf(Converter.toTitleCase(vStatus.cbsData.get(0).getType()));
+                        wanted = StringType.valueOf(Constants.INVALID);
+                        if (!vStatus.cbsData.isEmpty()) {
+                            wanted = StringType.valueOf(Converter.toTitleCase(vStatus.cbsData.get(0).getType()));
+                        }
                         assertEquals("Window", wanted.toString(), st.toString());
                         break;
                     case CHANNEL_GROUP_CHECK_CONTROL:
-                        wanted = StringType.valueOf(vStatus.checkControlMessages.get(0).ccmDescriptionShort);
+                        wanted = StringType.valueOf(Constants.INVALID);
+                        if (!vStatus.checkControlMessages.isEmpty()) {
+                            wanted = StringType.valueOf(vStatus.checkControlMessages.get(0).ccmDescriptionShort);
+                        }
                         assertEquals("Window", wanted.toString(), st.toString());
                         break;
                     default:
@@ -462,7 +484,10 @@ public class StatusWrapper {
                 dtt = (DateTimeType) state;
                 switch (gUid) {
                     case CHANNEL_GROUP_SERVICE:
-                        String dueDateString = vStatus.cbsData.get(0).getDueDate();
+                        String dueDateString = Constants.NULL_DATE;
+                        if (!vStatus.cbsData.isEmpty()) {
+                            dueDateString = vStatus.cbsData.get(0).getDueDate();
+                        }
                         DateTimeType expectedDTT = DateTimeType.valueOf(Converter.getLocalDateTime(dueDateString));
                         assertEquals("Service", expectedDTT.toString(), dtt.toString());
                         break;
