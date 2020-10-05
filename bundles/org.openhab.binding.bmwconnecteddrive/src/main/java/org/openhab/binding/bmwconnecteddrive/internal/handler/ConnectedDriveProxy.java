@@ -181,7 +181,7 @@ public class ConnectedDriveProxy {
                 callback);
     }
 
-    public void requestOldVehcileStatus(VehicleConfiguration vehicleConfiguration, StringResponseCallback callback) {
+    public void requestLegacyVehcileStatus(VehicleConfiguration vehicleConfiguration, StringResponseCallback callback) {
         get("https://b2vapi.bmwgroup.com/api/vehicle/dynamic/v1/" + vehicleConfiguration.vin, Optional.empty(),
                 callback);
     }
