@@ -81,6 +81,7 @@ public class ConnectedDriveProxy {
      * }
      */
     String baseUrl;
+    String legacyUrl;
     String vehicleStatusAPI = "/status";
     String lastTripAPI = "/statistics/lastTrip";
     String allTripsAPI = "/statistics/allTrips";
@@ -105,6 +106,7 @@ public class ConnectedDriveProxy {
         }
         authUri = uri.toString();
         baseUrl = "https://" + getRegionServer() + "/webapi/v1/user/vehicles/";
+        legacyUrl = "https://" + getRegionServer() + "/api/vehicle/dynamic/v1/";
     }
 
     private synchronized void call(String url, boolean post, Optional<MultiMap<String>> params,
@@ -181,8 +183,9 @@ public class ConnectedDriveProxy {
                 callback);
     }
 
-    public void requestLegacyVehcileStatus(VehicleConfiguration vehicleConfiguration, StringResponseCallback callback) {
-        get("https://b2vapi.bmwgroup.com/api/vehicle/dynamic/v1/" + vehicleConfiguration.vin, Optional.empty(),
+    public void requestLegacyVehcileStatus(VehicleConfiguration config, StringResponseCallback callback) {
+        // see https://github.com/jupe76/bmwcdapi/search?q=dynamic%2Fv1
+        get(new StringBuffer(legacyUrl).append(config.vin).append("?offset=-60").toString(), Optional.empty(),
                 callback);
     }
 

@@ -369,11 +369,11 @@ public class VehicleHandler extends VehicleChannelHandler {
 
     public void getData() {
         if (proxy.isPresent() && configuration.isPresent()) {
-            if (!legacyMode) {
-                proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
-            } else {
-                proxy.get().requestLegacyVehcileStatus(configuration.get(), oldVehicleStatusCallback);
-            }
+            // if (!legacyMode) {
+            proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
+            // } else {
+            proxy.get().requestLegacyVehcileStatus(configuration.get(), oldVehicleStatusCallback);
+            // }
             if (isSupported(Constants.STATISTICS)) {
                 proxy.get().requestLastTrip(configuration.get(), lastTripCallback);
                 proxy.get().requestAllTrips(configuration.get(), allTripsCallback);
@@ -641,6 +641,7 @@ public class VehicleHandler extends VehicleChannelHandler {
     public class LegacyVehicleStatusCallback implements StringResponseCallback {
         @Override
         public void onResponse(Optional<String> content) {
+            logger.info("Legacy Response {}", content.get());
             if (content.isPresent()) {
                 VehicleAttributesContainer vac = Converter.getGson().fromJson(content.get(),
                         VehicleAttributesContainer.class);
@@ -650,6 +651,7 @@ public class VehicleHandler extends VehicleChannelHandler {
 
         @Override
         public void onError(NetworkError error) {
+            logger.info("Legacy Error {}", error);
             vehicleStatusCallback.onError(error);
         }
     }
