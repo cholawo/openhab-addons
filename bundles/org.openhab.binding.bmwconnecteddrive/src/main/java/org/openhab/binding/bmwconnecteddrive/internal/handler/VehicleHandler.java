@@ -369,11 +369,11 @@ public class VehicleHandler extends VehicleChannelHandler {
 
     public void getData() {
         if (proxy.isPresent() && configuration.isPresent()) {
-            // if (!legacyMode) {
-            proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
-            // } else {
-            proxy.get().requestLegacyVehcileStatus(configuration.get(), oldVehicleStatusCallback);
-            // }
+            if (!legacyMode) {
+                proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
+            } else {
+                proxy.get().requestLegacyVehcileStatus(configuration.get(), oldVehicleStatusCallback);
+            }
             if (isSupported(Constants.STATISTICS)) {
                 proxy.get().requestLastTrip(configuration.get(), lastTripCallback);
                 proxy.get().requestAllTrips(configuration.get(), allTripsCallback);
