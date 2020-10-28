@@ -14,6 +14,12 @@ package org.openhab.binding.bmwconnecteddrive.internal.handler;
 
 import static org.openhab.binding.bmwconnecteddrive.internal.utils.HTTPConstants.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -58,6 +64,7 @@ public class ConnectedDriveProxy {
     private final Logger logger = LoggerFactory.getLogger(ConnectedDriveProxy.class);
     private final Token token = new Token();
     private HttpClient httpClient;
+    private HttpClient authHttpClient;
     private String authUri;
     private ConnectedDriveConfiguration configuration;
 
@@ -94,6 +101,13 @@ public class ConnectedDriveProxy {
 
     public ConnectedDriveProxy(HttpClientFactory httpClientFactory, ConnectedDriveConfiguration config) {
         httpClient = httpClientFactory.getCommonHttpClient();
+        authHttpClient = httpClientFactory.createHttpClient(AUTH_HTTP_CLIENT_NAME);
+        authHttpClient.setFollowRedirects(false);
+        try {
+            authHttpClient.start();
+        } catch (Exception e) {
+            logger.warn("Auth Http Client cannot be started");
+        }
         configuration = config;
         // generate URI for Authorization
         // see https://customer.bmwgroup.com/one/app/oauth.js
@@ -252,9 +266,9 @@ public class ConnectedDriveProxy {
      *
      * @return
      */
-    private synchronized void updateToken() {
-        httpClient.setFollowRedirects(false);
-        Request req = httpClient.POST(authUri);
+    private synchronized void jettyUpdateToken() {
+        logger.info("updateToken - start");
+        Request req = authHttpClient.POST(authUri);
 
         req.header(HttpHeader.CONTENT_TYPE, CONTENT_TYPE_URL_ENCODED);
         req.header(HttpHeader.CONNECTION, KEEP_ALIVE);
@@ -285,8 +299,51 @@ public class ConnectedDriveProxy {
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.debug("Authorization exception: {}", e.getMessage());
+            StackTraceElement[] trace = e.getStackTrace();
+            for (int i = 0; i < trace.length; i++) {
+                logger.info("{}", trace[i]);
+            }
         }
-        httpClient.setFollowRedirects(true);
+        logger.info("updateToken - finish");
+    }
+
+    private synchronized void updateToken() {
+        try {
+            URL url = new URL("https://customer.bmwgroup.com/gcdm/oauth/authenticate");
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+
+            con.setRequestProperty(HttpHeader.CONTENT_TYPE.toString(), CONTENT_TYPE_URL_ENCODED);
+            con.setRequestProperty(HttpHeader.CONNECTION.toString(), KEEP_ALIVE);
+            con.setRequestProperty(HttpHeader.HOST.toString(),
+                    BimmerConstants.SERVER_MAP.get(BimmerConstants.SERVER_ROW));
+            con.setRequestProperty(HttpHeader.AUTHORIZATION.toString(), BimmerConstants.AUTHORIZATION_VALUE);
+            con.setRequestProperty(CREDENTIALS, BimmerConstants.CREDENTIAL_VALUES);
+            con.setDoOutput(true);
+
+            MultiMap<String> dataMap = new MultiMap<String>();
+            dataMap.add(CLIENT_ID, BimmerConstants.CLIENT_ID_VALUE);
+            dataMap.add(RESPONSE_TYPE, TOKEN);
+            dataMap.add(REDIRECT_URI, BimmerConstants.REDIRECT_URI_VALUE);
+            dataMap.add(SCOPE, BimmerConstants.SCOPE_VALUES);
+            dataMap.add(USERNAME, configuration.userName);
+            dataMap.add(PASSWORD, configuration.password);
+            String urlEncodedData = UrlEncoded.encode(dataMap, Charset.defaultCharset(), false);
+            OutputStream os = con.getOutputStream();
+            byte[] input = urlEncodedData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            logger.info("Response Code {} Message {} ", con.getResponseCode(), con.getResponseMessage());
+            tokenFromUrl(con.getHeaderField(HttpHeader.LOCATION.toString()));
+        } catch (IOException e) {
+            logger.warn("{}", e.getMessage());
+        }
     }
 
     void tokenFromUrl(String encodedUrl) {
