@@ -42,9 +42,11 @@ import org.eclipse.smarthome.io.net.http.HttpClientFactory;
 import org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConfiguration;
 import org.openhab.binding.bmwconnecteddrive.internal.VehicleConfiguration;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.NetworkError;
+import org.openhab.binding.bmwconnecteddrive.internal.dto.auth.AuthResponse;
 import org.openhab.binding.bmwconnecteddrive.internal.handler.simulation.Injector;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.BimmerConstants;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.Constants;
+import org.openhab.binding.bmwconnecteddrive.internal.utils.Converter;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.ImageProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,7 @@ public class ConnectedDriveProxy {
     private HttpClient httpClient;
     private HttpClient authHttpClient;
     private String authUri;
+    private String legacyAuthUri;
     private ConnectedDriveConfiguration configuration;
 
     /**
@@ -119,6 +122,12 @@ public class ConnectedDriveProxy {
             uri.append("/gcdm/oauth/authenticate");
         }
         authUri = uri.toString();
+
+        StringBuffer legacyAuth = new StringBuffer();
+        legacyAuth.append("https://");
+        legacyAuth.append(BimmerConstants.SERVER_MAP.get(configuration.region));
+        legacyAuth.append(BimmerConstants.OAUTH_ENDPOINT_MAP.get(configuration.region));
+        legacyAuthUri = legacyAuth.toString();
         baseUrl = "https://" + getRegionServer() + "/webapi/v1/user/vehicles/";
         legacyUrl = "https://" + getRegionServer() + "/api/vehicle/dynamic/v1/";
     }
@@ -256,7 +265,7 @@ public class ConnectedDriveProxy {
      */
     public Token getToken() {
         if (token.isExpired() || !token.isValid()) {
-            updateToken();
+            legacyUpdateToken();
         }
         return token;
     }
@@ -341,6 +350,48 @@ public class ConnectedDriveProxy {
             }
             logger.info("Response Code {} Message {} ", con.getResponseCode(), con.getResponseMessage());
             tokenFromUrl(con.getHeaderField(HttpHeader.LOCATION.toString()));
+        } catch (IOException e) {
+            logger.warn("{}", e.getMessage());
+        }
+    }
+
+    private synchronized void legacyUpdateToken() {
+        try {
+            logger.info("Auth {}", legacyAuthUri);
+            URL url = new URL(legacyAuthUri);
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+
+            con.setRequestProperty(HttpHeader.CONTENT_TYPE.toString(), CONTENT_TYPE_URL_ENCODED);
+            con.setRequestProperty(HttpHeader.CONNECTION.toString(), KEEP_ALIVE);
+            con.setRequestProperty(HttpHeader.HOST.toString(),
+                    BimmerConstants.SERVER_MAP.get(BimmerConstants.SERVER_ROW));
+            con.setRequestProperty(HttpHeader.AUTHORIZATION.toString(), BimmerConstants.LEGACY_AUTHORIZATION_VALUE);
+            con.setRequestProperty(CREDENTIALS, BimmerConstants.LEGACY_CREDENTIAL_VALUES);
+            con.setDoOutput(true);
+
+            MultiMap<String> dataMap = new MultiMap<String>();
+            dataMap.add("grant_type", "password");
+            dataMap.add(SCOPE, BimmerConstants.SCOPE_VALUES);
+            dataMap.add(USERNAME, configuration.userName);
+            dataMap.add(PASSWORD, configuration.password);
+            String urlEncodedData = UrlEncoded.encode(dataMap, Charset.defaultCharset(), false);
+            OutputStream os = con.getOutputStream();
+            byte[] input = urlEncodedData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            logger.info("Response Code {} Message {} ", con.getResponseCode(), con.getResponseMessage());
+            // logger.info("Response {}", response.toString());
+            AuthResponse authResponse = Converter.getGson().fromJson(response.toString(), AuthResponse.class);
+            token.setToken(authResponse.access_token);
+            token.setType(authResponse.token_type);
+            token.setExpiration(authResponse.expires_in);
         } catch (IOException e) {
             logger.warn("{}", e.getMessage());
         }

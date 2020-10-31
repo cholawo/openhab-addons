@@ -20,6 +20,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.smarthome.io.net.http.HttpClientFactory;
 import org.junit.Test;
 import org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConfiguration;
+import org.openhab.binding.bmwconnecteddrive.internal.utils.BimmerConstants;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.HTTPConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,5 +45,19 @@ public class AuthTest {
         dcp.tokenFromUrl(headerValue);
         Token t = dcp.getToken();
         assertEquals("Token", "Bearer SfXKgkEXeeFJkVqdD4XMmfUU224MRuyh", t.getBearerToken());
+    }
+
+    public void testRealTokenUpdate() {
+        ConnectedDriveConfiguration config = new ConnectedDriveConfiguration();
+        config.region = BimmerConstants.REGION_ROW;
+        config.userName = "bla";
+        config.password = "blub";
+        HttpClientFactory hcf = mock(HttpClientFactory.class);
+        when(hcf.getCommonHttpClient()).thenReturn(mock(HttpClient.class));
+        when(hcf.createHttpClient(HTTPConstants.AUTH_HTTP_CLIENT_NAME)).thenReturn(mock(HttpClient.class));
+        ConnectedDriveProxy dcp = new ConnectedDriveProxy(hcf, config);
+        Token t = dcp.getToken();
+        logger.info("Token {}", t.getBearerToken());
+        logger.info("Expires {}", t.isExpired());
     }
 }
