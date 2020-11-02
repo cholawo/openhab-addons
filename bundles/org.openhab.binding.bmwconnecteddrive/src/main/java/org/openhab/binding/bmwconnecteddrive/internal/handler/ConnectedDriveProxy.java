@@ -125,8 +125,8 @@ public class ConnectedDriveProxy {
 
         StringBuffer legacyAuth = new StringBuffer();
         legacyAuth.append("https://");
-        legacyAuth.append(BimmerConstants.SERVER_MAP.get(configuration.region));
-        legacyAuth.append(BimmerConstants.OAUTH_ENDPOINT_MAP.get(configuration.region));
+        legacyAuth.append(BimmerConstants.AUTH_SERVER_MAP.get(configuration.region));
+        legacyAuth.append(BimmerConstants.OAUTH_ENDPOINT);
         legacyAuthUri = legacyAuth.toString();
         baseUrl = "https://" + getRegionServer() + "/webapi/v1/user/vehicles/";
         legacyUrl = "https://" + getRegionServer() + "/api/vehicle/dynamic/v1/";

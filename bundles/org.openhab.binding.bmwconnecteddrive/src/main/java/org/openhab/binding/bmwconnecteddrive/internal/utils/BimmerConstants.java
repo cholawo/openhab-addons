@@ -35,6 +35,18 @@ public class BimmerConstants {
     public static final String REGION_ROW = "ROW";
 
     // https://github.com/bimmerconnected/bimmer_connected/blob/master/bimmer_connected/country_selector.py
+    public static final String AUTH_SERVER_NORTH_AMERICA = "customer.bmwgroup.com/gcdm/usa";
+    public static final String AUTH_SERVER_CHINA = "customer.bmwgroup.cn/gcdm";
+    public static final String AUTH_SERVER_ROW = "customer.bmwgroup.com/gcdm";
+    public static final Map<String, String> AUTH_SERVER_MAP = new HashMap<String, String>() {
+        {
+            put(REGION_NORTH_AMERICA, AUTH_SERVER_NORTH_AMERICA);
+            put(REGION_CHINA, AUTH_SERVER_CHINA);
+            put(REGION_ROW, AUTH_SERVER_ROW);
+        }
+    };
+    public static final String OAUTH_ENDPOINT = "/oauth/token";
+
     public static final String SERVER_NORTH_AMERICA = "b2vapi.bmwgroup.us";
     public static final String SERVER_CHINA = "b2vapi.bmwgroup.cn:8592";
     public static final String SERVER_ROW = "b2vapi.bmwgroup.com";
@@ -43,17 +55,6 @@ public class BimmerConstants {
             put(REGION_NORTH_AMERICA, SERVER_NORTH_AMERICA);
             put(REGION_CHINA, SERVER_CHINA);
             put(REGION_ROW, SERVER_ROW);
-        }
-    };
-
-    public static final String OAUTH_ENDPOINT_NORTH_AMERICA = "/gcdm/usa/oauth/token";
-    public static final String OAUTH_ENDPOINT_CHINA = "/gcdm/oauth/token";
-    public static final String OAUTH_ENDPOINT_ROW = "/gcdm/oauth/token";
-    public static final Map<String, String> OAUTH_ENDPOINT_MAP = new HashMap<String, String>() {
-        {
-            put(REGION_NORTH_AMERICA, OAUTH_ENDPOINT_NORTH_AMERICA);
-            put(REGION_CHINA, OAUTH_ENDPOINT_CHINA);
-            put(REGION_ROW, OAUTH_ENDPOINT_ROW);
         }
     };
 
