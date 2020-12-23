@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class BimmerConstants {
 
+    // https://github.com/bimmerconnected/bimmer_connected/blob/master/bimmer_connected/country_selector.py
     public static final String REGION_NORTH_AMERICA = "NORTH_AMERICA";
     public static final String REGION_CHINA = "CHINA";
     public static final String REGION_ROW = "ROW";

@@ -47,6 +47,7 @@ public class AuthTest {
         assertEquals("Token", "Bearer SfXKgkEXeeFJkVqdD4XMmfUU224MRuyh", t.getBearerToken());
     }
 
+    @Test
     public void testRealTokenUpdate() {
         ConnectedDriveConfiguration config = new ConnectedDriveConfiguration();
         config.region = BimmerConstants.REGION_ROW;

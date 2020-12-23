@@ -134,6 +134,8 @@ public class ConnectedDriveProxy {
 
     private synchronized void call(String url, boolean post, Optional<MultiMap<String>> params,
             ResponseCallback callback) {
+        // only executed in "simulation mode"
+        // SimulationTest.testSimulationOff() assures Injector is off when releasing
         if (Injector.isActive()) {
             if (url.equals(baseUrl)) {
                 ((StringResponseCallback) callback).onResponse(Optional.of(Injector.getDiscovery()));
