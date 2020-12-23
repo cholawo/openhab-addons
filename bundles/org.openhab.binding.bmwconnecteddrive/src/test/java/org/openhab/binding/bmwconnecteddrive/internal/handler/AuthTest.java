@@ -47,12 +47,11 @@ public class AuthTest {
         assertEquals("Token", "Bearer SfXKgkEXeeFJkVqdD4XMmfUU224MRuyh", t.getBearerToken());
     }
 
-    @Test
     public void testRealTokenUpdate() {
         ConnectedDriveConfiguration config = new ConnectedDriveConfiguration();
-        config.region = BimmerConstants.REGION_ROW;
-        config.userName = "bla";
-        config.password = "blub";
+        config.region = BimmerConstants.REGION_NORTH_AMERICA;
+        config.userName = "";
+        config.password = "";
         HttpClientFactory hcf = mock(HttpClientFactory.class);
         when(hcf.getCommonHttpClient()).thenReturn(mock(HttpClient.class));
         when(hcf.createHttpClient(HTTPConstants.AUTH_HTTP_CLIENT_NAME)).thenReturn(mock(HttpClient.class));
