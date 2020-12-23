@@ -63,18 +63,18 @@ sitemap BMW label="BMW" {
     Switch  item=i3CCNext            
   }
   Frame label="Door Details" {
-    Text    item=i3DriverDoor
-    Text    item=i3DriverDoorRear  
-    Text    item=i3PassengerDoor 
-    Text    item=i3PassengerDoorRear 
-    Text    item=i3Hood 
-    Text    item=i3Trunk
-    Text    item=i3DriverWindow
-    Text    item=i3DriverWindowRear 
-    Text    item=i3PassengerWindow 
-    Text    item=i3PassengerWindowRear 
-    Text    item=i3RearWindow 
-    Text    item=i3Sunroof 
+    Text    item=i3DriverDoor visibility=[i3DriverDoor!="INVALID"]
+    Text    item=i3DriverDoorRear visibility=[i3DriverDoorRear!="INVALID"]  
+    Text    item=i3PassengerDoor visibility=[i3PassengerDoor!="INVALID"]
+    Text    item=i3PassengerDoorRear visibility=[i3PassengerDoorRear!="INVALID"]
+    Text    item=i3Hood visibility=[i3Hood!="INVALID"]
+    Text    item=i3Trunk visibility=[i3Trunk!="INVALID"]
+    Text    item=i3DriverWindow visibility=[i3DriverWindow!="INVALID"]
+    Text    item=i3DriverWindowRear visibility=[i3DriverWindowRear!="INVALID"]
+    Text    item=i3PassengerWindow visibility=[i3PassengerWindow!="INVALID"]
+    Text    item=i3PassengerWindowRear visibility=[i3PassengerWindowRear!="INVALID"]
+    Text    item=i3RearWindow visibility=[i3RearWindow!="INVALID"]
+    Text    item=i3Sunroof visibility=[i3Sunroof!="INVALID"]
   }
   Frame label="Location" {
     Text    item=i3Latitude           
