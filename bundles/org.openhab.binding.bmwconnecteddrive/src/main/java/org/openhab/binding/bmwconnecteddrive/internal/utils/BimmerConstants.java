@@ -37,8 +37,8 @@ public class BimmerConstants {
 
     // https://github.com/bimmerconnected/bimmer_connected/blob/master/bimmer_connected/country_selector.py
     public static final String AUTH_SERVER_NORTH_AMERICA = "b2vapi.bmwgroup.us/gcdm";
-    public static final String AUTH_SERVER_CHINA = "customer.bmwgroup.cn/gcdm";
-    public static final String AUTH_SERVER_ROW = "customer.bmwgroup.com/gcdm";
+    public static final String AUTH_SERVER_CHINA = "b2vapi.bmwgroup.cn/gcdm";
+    public static final String AUTH_SERVER_ROW = "b2vapi.bmwgroup.com/gcdm";
     public static final Map<String, String> AUTH_SERVER_MAP = new HashMap<String, String>() {
         {
             put(REGION_NORTH_AMERICA, AUTH_SERVER_NORTH_AMERICA);

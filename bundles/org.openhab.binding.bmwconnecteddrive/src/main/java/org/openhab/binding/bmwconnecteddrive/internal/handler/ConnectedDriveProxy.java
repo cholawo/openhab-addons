@@ -14,12 +14,6 @@ package org.openhab.binding.bmwconnecteddrive.internal.handler;
 
 import static org.openhab.binding.bmwconnecteddrive.internal.utils.HTTPConstants.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -271,7 +265,7 @@ public class ConnectedDriveProxy {
      */
     public Token getToken() {
         if (token.isExpired() || !token.isValid()) {
-            legacyUpdateToken();
+            jettyUpdateToken();
         }
         return token;
     }
@@ -308,7 +302,7 @@ public class ConnectedDriveProxy {
         req.content(new StringContentProvider(urlEncodedData));
         try {
             ContentResponse contentResponse = req.timeout(HTTP_TIMEOUT_SEC, TimeUnit.SECONDS).send();
-            logger.info("updateToken result {}", contentResponse.getContentAsString());
+            // logger.info("updateToken result {}", contentResponse.getContentAsString());
             // Status needs to be 302 - Response is stored in Header
             if (contentResponse.getStatus() == 302) {
                 HttpFields fields = contentResponse.getHeaders();
@@ -374,47 +368,47 @@ public class ConnectedDriveProxy {
      * }
      * }
      */
-    private synchronized void legacyUpdateToken() {
-        try {
-            logger.info("Auth {}", legacyAuthUri);
-            URL url = new URL(legacyAuthUri);
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-
-            con.setRequestProperty(HttpHeader.CONTENT_TYPE.toString(), CONTENT_TYPE_URL_ENCODED);
-            con.setRequestProperty(HttpHeader.CONNECTION.toString(), KEEP_ALIVE);
-            con.setRequestProperty(HttpHeader.HOST.toString(), BimmerConstants.SERVER_MAP.get(configuration.region));
-            con.setRequestProperty(HttpHeader.AUTHORIZATION.toString(),
-                    BimmerConstants.AUTHORIZATION_VALUE_MAP.get(configuration.region));
-            con.setRequestProperty(CREDENTIALS, BimmerConstants.LEGACY_CREDENTIAL_VALUES);
-            con.setDoOutput(true);
-
-            MultiMap<String> dataMap = new MultiMap<String>();
-            dataMap.add("grant_type", "password");
-            dataMap.add(SCOPE, BimmerConstants.SCOPE_VALUES);
-            dataMap.add(USERNAME, configuration.userName);
-            dataMap.add(PASSWORD, configuration.password);
-            String urlEncodedData = UrlEncoded.encode(dataMap, Charset.defaultCharset(), false);
-            OutputStream os = con.getOutputStream();
-            byte[] input = urlEncodedData.getBytes("utf-8");
-            os.write(input, 0, input.length);
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-            StringBuilder response = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            logger.info("Response Code {} Message {} ", con.getResponseCode(), con.getResponseMessage());
-            // logger.info("Response {}", response.toString());
-            AuthResponse authResponse = Converter.getGson().fromJson(response.toString(), AuthResponse.class);
-            token.setToken(authResponse.access_token);
-            token.setType(authResponse.token_type);
-            token.setExpiration(authResponse.expires_in);
-        } catch (IOException e) {
-            logger.warn("{}", e.getMessage());
-        }
-    }
+    // private synchronized void legacyUpdateToken() {
+    // try {
+    // logger.info("Auth {}", legacyAuthUri);
+    // URL url = new URL(legacyAuthUri);
+    // HttpURLConnection.setFollowRedirects(false);
+    // HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    // con.setRequestMethod("POST");
+    //
+    // con.setRequestProperty(HttpHeader.CONTENT_TYPE.toString(), CONTENT_TYPE_URL_ENCODED);
+    // con.setRequestProperty(HttpHeader.CONNECTION.toString(), KEEP_ALIVE);
+    // con.setRequestProperty(HttpHeader.HOST.toString(), BimmerConstants.SERVER_MAP.get(configuration.region));
+    // con.setRequestProperty(HttpHeader.AUTHORIZATION.toString(),
+    // BimmerConstants.AUTHORIZATION_VALUE_MAP.get(configuration.region));
+    // con.setRequestProperty(CREDENTIALS, BimmerConstants.LEGACY_CREDENTIAL_VALUES);
+    // con.setDoOutput(true);
+    //
+    // MultiMap<String> dataMap = new MultiMap<String>();
+    // dataMap.add("grant_type", "password");
+    // dataMap.add(SCOPE, BimmerConstants.SCOPE_VALUES);
+    // dataMap.add(USERNAME, configuration.userName);
+    // dataMap.add(PASSWORD, configuration.password);
+    // String urlEncodedData = UrlEncoded.encode(dataMap, Charset.defaultCharset(), false);
+    // OutputStream os = con.getOutputStream();
+    // byte[] input = urlEncodedData.getBytes("utf-8");
+    // os.write(input, 0, input.length);
+    // BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+    // StringBuilder response = new StringBuilder();
+    // String responseLine = null;
+    // while ((responseLine = br.readLine()) != null) {
+    // response.append(responseLine.trim());
+    // }
+    // logger.info("Response Code {} Message {} ", con.getResponseCode(), con.getResponseMessage());
+    // // logger.info("Response {}", response.toString());
+    // AuthResponse authResponse = Converter.getGson().fromJson(response.toString(), AuthResponse.class);
+    // token.setToken(authResponse.access_token);
+    // token.setType(authResponse.token_type);
+    // token.setExpiration(authResponse.expires_in);
+    // } catch (IOException e) {
+    // logger.warn("{}", e.getMessage());
+    // }
+    // }
 
     void tokenFromUrl(String encodedUrl) {
         MultiMap<String> tokenMap = new MultiMap<String>();
