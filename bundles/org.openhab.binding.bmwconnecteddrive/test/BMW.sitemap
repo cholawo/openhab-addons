@@ -23,12 +23,7 @@ sitemap BMW label="BMW" {
     Text    item=i3LastUpdate               
   }
   Frame label="Remote Services" {
-    Switch  item=i3RemoteFlash              
-    Switch  item=i3RemoteFinder            
-    Switch  item=i3RemoteLock               
-    Switch  item=i3RemoteUnlock             
-    Switch  item=i3RemoteHorn               
-    Switch  item=i3RemoteClimate            
+    Text    item=i3RemoteCommand              
     Text    item=i3RemoteState              
   }
   Frame label="Last Trip" {
@@ -51,34 +46,27 @@ sitemap BMW label="BMW" {
     Text    item=i3ServiceName          
     Text    item=i3ServiceMileage          
     Text    item=i3ServiceDate          
-    Text    item=i3ServiceCount          
-    Text    item=i3ServiceIndex          
-    Switch  item=i3NextService            
   }
   Frame label="CheckControl" {
     Text    item=i3CCName          
     Text    item=i3CCMileage          
-    Text    item=i3CCCount          
-    Text    item=i3CCIndex          
-    Switch  item=i3CCNext            
   }
   Frame label="Door Details" {
-    Text    item=i3DriverDoor
-    Text    item=i3DriverDoorRear  
-    Text    item=i3PassengerDoor 
-    Text    item=i3PassengerDoorRear 
-    Text    item=i3Hood 
-    Text    item=i3Trunk
-    Text    item=i3DriverWindow
-    Text    item=i3DriverWindowRear 
-    Text    item=i3PassengerWindow 
-    Text    item=i3PassengerWindowRear 
-    Text    item=i3RearWindow 
-    Text    item=i3Sunroof 
+    Text    item=i3DriverDoor visibility=[i3DriverDoor!="INVALID"]
+    Text    item=i3DriverDoorRear visibility=[i3DriverDoorRear!="INVALID"]  
+    Text    item=i3PassengerDoor visibility=[i3PassengerDoor!="INVALID"]
+    Text    item=i3PassengerDoorRear visibility=[i3PassengerDoorRear!="INVALID"]
+    Text    item=i3Hood visibility=[i3Hood!="INVALID"]
+    Text    item=i3Trunk visibility=[i3Trunk!="INVALID"]
+    Text    item=i3DriverWindow visibility=[i3DriverWindow!="INVALID"]
+    Text    item=i3DriverWindowRear visibility=[i3DriverWindowRear!="INVALID"]
+    Text    item=i3PassengerWindow visibility=[i3PassengerWindow!="INVALID"]
+    Text    item=i3PassengerWindowRear visibility=[i3PassengerWindowRear!="INVALID"]
+    Text    item=i3RearWindow visibility=[i3RearWindow!="INVALID"]
+    Text    item=i3Sunroof visibility=[i3Sunroof!="INVALID"]
   }
   Frame label="Location" {
-    Text    item=i3Latitude           
-    Text    item=i3Longitude          
+    Text    item=i3Location          
     Text    item=i3Heading             
   }
   Frame label="Charge Profile" {    
@@ -98,16 +86,10 @@ sitemap BMW label="BMW" {
   } 
   Frame label="Last Destinations" {    
     Text  item=i3DestName                 
-    Text  item=i3DestLat                                                                                   
-    Text  item=i3DestLon                                                                                    
-    Text  item=i3DestCount                 
-    Text  item=i3DestIndex                                                                                        
-    Switch  item=i3DestNext                                                                                        
+    Text  item=i3DestLocation                                                                                   
   }  
-  Frame label="Troubleshooting & Image Properties" {
+  Frame label="Image Properties" {
     Text    item=i3ImageViewport
     Text    item=i3ImageSize 
-    Switch  item=i3DiscoveryTroubleshoot    
-    Switch  item=i3Troubleshoot             
   } 
 }
