@@ -36,7 +36,7 @@ sitemap BMW label="BMW" {
     Text    item=i3AvgTripCombined     
   }
   Frame label="Lifetime" {
-    Text    item=i3CumulatedElectric  
+    Text    item=i3TotalElectric  
     Text    item=i3LongestEVTrip      
     Text    item=i3AvgConsumption     
     Text    item=i3AvgRecuperation          
