@@ -156,17 +156,41 @@ public class ConnectedDriveConstants {
     // Charge Profile
     public static final String CHARGE_PROFILE_CLIMATE = "profile-climate";
     public static final String CHARGE_PROFILE_MODE = "profile-mode";
-    public static final String CHARGE_WINDOW_START = "window-start";
-    public static final String CHARGE_WINDOW_END = "window-end";
-    public static final String CHARGE_TIMER1_DEPARTURE = "timer1-departure";
-    public static final String CHARGE_TIMER1_DAYS = "timer1-days";
+    public static final String CHARGE_PROFILE_PREFS = "profile-prefs";
+    public static final String CHARGE_WINDOW_START_HOUR = "window-start-hour";
+    public static final String CHARGE_WINDOW_START_MINUTE = "window-start-minute";
+    public static final String CHARGE_WINDOW_END_HOUR = "window-end-hour";
+    public static final String CHARGE_WINDOW_END_MINUTE = "window-end-minute";
+    public static final String CHARGE_TIMER1_DEPARTURE_HOUR = "timer1-departure-hour";
+    public static final String CHARGE_TIMER1_DEPARTURE_MINUTE = "timer1-departure-minute";
+    public static final String CHARGE_TIMER1_DAY_MON = "timer1-day-mon";
+    public static final String CHARGE_TIMER1_DAY_TUE = "timer1-day-tue";
+    public static final String CHARGE_TIMER1_DAY_WED = "timer1-day-wed";
+    public static final String CHARGE_TIMER1_DAY_THU = "timer1-day-thu";
+    public static final String CHARGE_TIMER1_DAY_FRI = "timer1-day-fri";
+    public static final String CHARGE_TIMER1_DAY_SAT = "timer1-day-sat";
+    public static final String CHARGE_TIMER1_DAY_SUN = "timer1-day-sun";
     public static final String CHARGE_TIMER1_ENABLED = "timer1-enabled";
-    public static final String CHARGE_TIMER2_DEPARTURE = "timer2-departure";
-    public static final String CHARGE_TIMER2_DAYS = "timer2-days";
+    public static final String CHARGE_TIMER2_DEPARTURE_HOUR = "timer2-departure-hour";
+    public static final String CHARGE_TIMER2_DEPARTURE_MINUTE = "timer2-departure-minute";
+    public static final String CHARGE_TIMER2_DAY_MON = "timer2-day-mon";
+    public static final String CHARGE_TIMER2_DAY_TUE = "timer2-daytue";
+    public static final String CHARGE_TIMER2_DAY_WED = "timer2-day-wed";
+    public static final String CHARGE_TIMER2_DAY_THU = "timer2-day-thu";
+    public static final String CHARGE_TIMER2_DAY_FRI = "timer2-day-fri";
+    public static final String CHARGE_TIMER2_DAY_SAT = "timer2-day-sat";
+    public static final String CHARGE_TIMER2_DAY_SUN = "timer2-day-sun";
     public static final String CHARGE_TIMER2_ENABLED = "timer2-enabled";
-    public static final String CHARGE_TIMER3_DEPARTURE = "timer3-departure";
-    public static final String CHARGE_TIMER3_ENABLED = "timer3-days";
-    public static final String CHARGE_TIMER3_DAYS = "timer3-enabled";
+    public static final String CHARGE_TIMER3_DEPARTURE_HOUR = "timer3-departure-hour";
+    public static final String CHARGE_TIMER3_DEPARTURE_MINUTE = "timer3-departure-minute";
+    public static final String CHARGE_TIMER3_DAY_MON = "timer3-day-mon";
+    public static final String CHARGE_TIMER3_DAY_TUE = "timer3-day-tue";
+    public static final String CHARGE_TIMER3_DAY_WED = "timer3-day-wed";
+    public static final String CHARGE_TIMER3_DAY_THU = "timer3-day-thu";
+    public static final String CHARGE_TIMER3_DAY_FRI = "timer3-day-fri";
+    public static final String CHARGE_TIMER3_DAY_SAT = "timer3-day-sat";
+    public static final String CHARGE_TIMER3_DAY_SUN = "timer3-day-sun";
+    public static final String CHARGE_TIMER3_ENABLED = "timer3-enabled";
 
     // Range
     public static final String RANGE_HYBRID = "hybrid";
@@ -202,6 +226,8 @@ public class ConnectedDriveConstants {
     public static final String REMOTE_SERVICE_DOOR_UNLOCK = "unlock";
     public static final String REMOTE_SERVICE_HORN = "horn";
     public static final String REMOTE_SERVICE_AIR_CONDITIONING = "climate";
+    public static final String REMOTE_SERVICE_CHARGE_NOW = "charge-now";
+    public static final String REMOTE_SERVICE_CHARGING_CONTROL = "charge-control";
     public static final String REMOTE_STATE = "state";
 
     // Troubleshoot

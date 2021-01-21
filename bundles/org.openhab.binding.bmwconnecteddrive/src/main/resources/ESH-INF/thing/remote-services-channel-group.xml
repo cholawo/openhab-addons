@@ -13,6 +13,8 @@
 			<channel id="unlock" typeId="remote-unlock-channel"/>
 			<channel id="horn" typeId="remote-horn-channel"/>
 			<channel id="climate" typeId="remote-climate-channel"/>
+			<channel id="charge-now" typeId="remote-charge-now-channel"/>
+			<channel id="charge-control" typeId="remote-charging-control-channel"/>
 			<channel id="state" typeId="remote-state-channel"/>
 		</channels>
 	</channel-group-type>

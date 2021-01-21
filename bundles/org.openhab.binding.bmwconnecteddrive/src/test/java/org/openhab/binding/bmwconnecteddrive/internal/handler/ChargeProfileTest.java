@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class ChargeProfileTest {
     private final Logger logger = LoggerFactory.getLogger(VehicleHandler.class);
 
-    private static final int PROFILE_CALLBACK_NUMBER = 13;
+    private static final int PROFILE_CALLBACK_NUMBER = 37;
 
     @Nullable
     ArgumentCaptor<ChannelUID> channelCaptor;
@@ -112,10 +112,18 @@ public class ChargeProfileTest {
      * Channel testbinding::test:charge#timer3-days
      */
     @Test
-    public void testChargingProfile() {
+    public void testi3ChargingProfile() {
         logger.info("{}", Thread.currentThread().getStackTrace()[1].getMethodName());
         setup(VehicleType.ELECTRIC_REX.toString(), false);
         String content = FileReader.readFileInString("src/test/resources/webapi/charging-profile.json");
+        testProfile(content, PROFILE_CALLBACK_NUMBER);
+    }
+
+    @Test
+    public void testHybridChargingProfile() {
+        logger.info("{}", Thread.currentThread().getStackTrace()[1].getMethodName());
+        setup(VehicleType.ELECTRIC_REX.toString(), false);
+        String content = FileReader.readFileInString("src/test/resources/responses/XE225/charge-profile.json");
         testProfile(content, PROFILE_CALLBACK_NUMBER);
     }
 }

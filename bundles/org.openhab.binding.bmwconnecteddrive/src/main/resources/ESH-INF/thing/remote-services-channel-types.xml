@@ -27,6 +27,14 @@
 		<item-type>Switch</item-type>
 		<label>Active Air Conditioning</label>
 	</channel-type>
+	<channel-type id="remote-charge-now-channel">
+		<item-type>Switch</item-type>
+		<label>Charge Now</label>
+	</channel-type>
+	<channel-type id="remote-charging-control-channel">
+		<item-type>Switch</item-type>
+		<label>Charging Control</label>
+	</channel-type>
 	<channel-type id="remote-state-channel">
 		<item-type>String</item-type>
 		<label>Service Execution State</label>

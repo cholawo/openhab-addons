@@ -9,46 +9,142 @@
 	</channel-type>
 	<channel-type id="profile-mode-channel">
 		<item-type>String</item-type>
-		<label>Charging Mode for Profile</label>
+		<label>Charging Mode</label>
 	</channel-type>
-	<channel-type id="window-start-channel">
+	<channel-type id="profile-prefs-channel">
 		<item-type>String</item-type>
-		<label>Charging Window Start Time</label>
+		<label>Charging Preferences</label>
 	</channel-type>
-	<channel-type id="window-end-channel">
-		<item-type>String</item-type>
-		<label>Charging Window End Time</label>
+	<channel-type id="window-start-hour-channel">
+		<item-type>Number:Time</item-type>
+		<label>Charging Window Start Hour</label>
 	</channel-type>
-	<channel-type id="timer1-departure-channel">
-		<item-type>String</item-type>
+	<channel-type id="window-start-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Charging Window Start Minute</label>
+	</channel-type>
+	<channel-type id="window-end-hour-channel">
+		<item-type>Number:Time</item-type>
+		<label>Charging Window End Hour</label>
+	</channel-type>
+	<channel-type id="window-end-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Charging Window End Minute</label>
+	</channel-type>
+	<channel-type id="timer1-departure-hour-channel">
+		<item-type>Number:Time</item-type>
 		<label>Timer 1: Departure Time</label>
 	</channel-type>
-	<channel-type id="timer1-days-channel">
-		<item-type>String</item-type>
+	<channel-type id="timer1-departure-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Timer 1: Departure Time</label>
+	</channel-type>
+	<channel-type id="timer1-days-mon-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-tue-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-wed-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-thu-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-fri-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-sat-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 1: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer1-days-sun-channel">
+		<item-type>Switch</item-type>
 		<label>Timer 1: Scheduled Days</label>
 	</channel-type>
 	<channel-type id="timer1-enabled-channel">
 		<item-type>Switch</item-type>
 		<label>Timer 1: Enabled</label>
 	</channel-type>
-	<channel-type id="timer2-departure-channel">
-		<item-type>String</item-type>
-		<label>Timer 2: Departure Time</label>
+	<channel-type id="timer2-departure-hour-channel">
+		<item-type>Number:Time</item-type>
+		<label>Timer 2: Departure Time Hour</label>
 	</channel-type>
-	<channel-type id="timer2-days-channel">
-		<item-type>String</item-type>
+	<channel-type id="timer2-departure-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Timer 2: Departure Time Minute</label>
+	</channel-type>
+	<channel-type id="timer2-days-mon-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-tue-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-wed-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-thu-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-fri-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-sat-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 2: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer2-days-sun-channel">
+		<item-type>Switch</item-type>
 		<label>Timer 2: Scheduled Days</label>
 	</channel-type>
 	<channel-type id="timer2-enabled-channel">
 		<item-type>Switch</item-type>
 		<label>Timer 2: Enabled</label>
 	</channel-type>
-	<channel-type id="timer3-departure-channel">
-		<item-type>String</item-type>
-		<label>Timer 3: Departure Time</label>
+	<channel-type id="timer3-departure-hour-channel">
+		<item-type>Number:Time</item-type>
+		<label>Timer 3: Departure Time Hour</label>
 	</channel-type>
-	<channel-type id="timer3-days-channel">
-		<item-type>String</item-type>
+	<channel-type id="timer3-departure-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Timer 3: Departure Time Minute</label>
+	</channel-type>
+	<channel-type id="timer3-days-mon-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-tue-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-wed-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-thu-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-fri-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-sat-channel">
+		<item-type>Switch</item-type>
+		<label>Timer 3: Scheduled Days</label>
+	</channel-type>
+	<channel-type id="timer3-days-sun-channel">
+		<item-type>Switch</item-type>
 		<label>Timer 3: Scheduled Days</label>
 	</channel-type>
 	<channel-type id="timer3-enabled-channel">

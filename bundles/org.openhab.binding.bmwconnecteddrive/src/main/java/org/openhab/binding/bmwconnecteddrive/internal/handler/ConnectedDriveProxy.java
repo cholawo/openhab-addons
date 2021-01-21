@@ -148,9 +148,11 @@ public class ConnectedDriveProxy {
             req = httpClient.POST(completeUrl.toString());
             if (params.isPresent()) {
                 String urlEncodedParameter = UrlEncoded.encode(params.get(), Charset.defaultCharset(), false);
-                req.header(HttpHeader.CONTENT_TYPE, CONTENT_TYPE_URL_ENCODED);
-                req.header(CONTENT_LENGTH, Integer.toString(urlEncodedParameter.length()));
-                req.content(new StringContentProvider(urlEncodedParameter));
+                // req.header(HttpHeader.CONTENT_TYPE, CONTENT_TYPE_URL_ENCODED);
+                // req.header(CONTENT_LENGTH, Integer.toString(urlEncodedParameter.length()));
+                // req.content(new StringContentProvider(urlEncodedParameter));
+                req.content(new StringContentProvider(CONTENT_TYPE_URL_ENCODED, urlEncodedParameter,
+                        Charset.defaultCharset()));
             }
         } else {
             if (params.isPresent()) {

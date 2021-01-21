@@ -34,10 +34,10 @@ import org.eclipse.smarthome.core.thing.binding.BridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
+import org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConstants;
 import org.openhab.binding.bmwconnecteddrive.internal.VehicleConfiguration;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.DestinationContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.NetworkError;
-import org.openhab.binding.bmwconnecteddrive.internal.dto.charge.ChargeProfile;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.compat.VehicleAttributesContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTrips;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.statistics.AllTripsContainer;
@@ -47,6 +47,7 @@ import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatus;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.status.VehicleStatusContainer;
 import org.openhab.binding.bmwconnecteddrive.internal.handler.RemoteServiceHandler.ExecutionState;
 import org.openhab.binding.bmwconnecteddrive.internal.handler.RemoteServiceHandler.RemoteService;
+import org.openhab.binding.bmwconnecteddrive.internal.utils.ChargeProfileWrapper;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.Constants;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.Converter;
 import org.openhab.binding.bmwconnecteddrive.internal.utils.ImageProperties;
@@ -69,6 +70,8 @@ public class VehicleHandler extends VehicleChannelHandler {
     private Optional<VehicleConfiguration> configuration = Optional.empty();
     private Optional<ConnectedDriveBridgeHandler> bridgeHandler = Optional.empty();
     private Optional<ScheduledFuture<?>> refreshJob = Optional.empty();
+    private Optional<ScheduledFuture<?>> editTimeout = Optional.empty();
+    private boolean editingChargeProfile = false;
 
     private ImageProperties imageProperties = new ImageProperties();
 
@@ -106,6 +109,7 @@ public class VehicleHandler extends VehicleChannelHandler {
             } else if (CHANNEL_GROUP_TROUBLESHOOT.equals(group)) {
                 imageCallback.onResponse(imageCache);
             }
+            return;
         }
 
         // Check for Channel Group and corresponding Actions
@@ -139,10 +143,76 @@ public class VehicleHandler extends VehicleChannelHandler {
                                 updateState(remoteFinderChannel,
                                         OnOffType.from(remote.get().execute(RemoteService.VEHICLE_FINDER)));
                                 break;
+                            case REMOTE_SERVICE_CHARGE_NOW:
+                                updateState(remoteChargeNowChannel,
+                                        OnOffType.from(remote.get().execute(RemoteService.CHARGE_NOW)));
+                                break;
+                            case REMOTE_SERVICE_CHARGING_CONTROL:
+                                updateState(remoteChargingCOntrolChannel, OnOffType.from(remote.get()
+                                        .execute(RemoteService.CHARGING_CONTROL, chargeProfileEdit.get().getJson())));
+                                // allow updates again
+                                stopEdit();
+                                break;
                         }
                     }
                     updateState(vehicleFingerPrint, OnOffType.OFF);
                 }
+            }
+        } else if (CHANNEL_GROUP_CHARGE.equals(group)) {
+            String channelName = channelUID.getIdWithoutGroup();
+            // block updates from now on and create object for editing
+            synchronized (chargeProfileCache) {
+                editingChargeProfile = true;
+            }
+            if (!chargeProfileEdit.isPresent()) {
+                if (chargeProfileCache.isPresent()) {
+                    chargeProfileEdit = Optional.of(new ChargeProfileWrapper(chargeProfileCache.get()));
+                    logger.info("Charge Profile editing - start");
+                    logger.info("{}", chargeProfileEdit.get().getJson());
+                } else {
+                    logger.info("No ChargeProfile recieved so far - cannot start editing");
+                }
+            }
+            if (chargeProfileEdit.isPresent()) {
+                if (channelName.equals(ConnectedDriveConstants.CHARGE_PROFILE_CLIMATE)) {
+                    chargeProfileEdit.get().enableDisableClimate(command.equals(OnOffType.ON) ? true : false);
+                } else if (channelName.equals(ConnectedDriveConstants.CHARGE_PROFILE_MODE)) {
+                    chargeProfileEdit.get().setChargeMode(command.toFullString());
+                } else if (channelName.equals(ConnectedDriveConstants.CHARGE_PROFILE_PREFS)) {
+                    chargeProfileEdit.get().setChargePreferences(command.toFullString());
+                } else if (channelName.startsWith("window")) {
+                    chargeProfileEdit.get().setTime(channelName, ((DecimalType) command).intValue());
+                } else if (channelName.startsWith("timer")) {
+                    int timerId = 0;
+                    if (channelName.startsWith("timer1")) {
+                        timerId = 1;
+                    } else if (channelName.startsWith("timer2")) {
+                        timerId = 2;
+                    } else if (channelName.startsWith("timer3")) {
+                        timerId = 3;
+                    }
+                    if (channelName.contains("departure")) {
+                        chargeProfileEdit.get().setTime(channelName, ((DecimalType) command).intValue());
+                    } else if (channelName.contains("day")) {
+                        chargeProfileEdit.get().daySelection(timerId, channelDayMapping.get(channelName),
+                                (OnOffType) command);
+                    } else if (channelName.contains("enable")) {
+                        chargeProfileEdit.get().enableDisableTimer(timerId,
+                                OnOffType.ON.equals(command) ? true : false);
+                    } else {
+                        logger.info("No editing for {} found ", channelName);
+                    }
+                } else {
+                    logger.info("No editing for {} found ", channelName);
+                }
+            }
+            // start edit timer with 5 min timeout
+            if (editTimeout.isPresent()) {
+                // cancel current timer and add another 5 mins - valid for each edit
+                editTimeout.get().cancel(true);
+                editTimeout = Optional.of(scheduler.schedule(this::stopEdit, 5, TimeUnit.MINUTES));
+            } else {
+                editTimeout = Optional.of(scheduler.schedule(this::stopEdit, 5, TimeUnit.MINUTES));
             }
         } else if (CHANNEL_GROUP_VEHICLE_IMAGE.equals(group)) {
             // Image Change
@@ -341,6 +411,17 @@ public class VehicleHandler extends VehicleChannelHandler {
         }
     }
 
+    /**
+     * Editing of ChargeProfile stopped after timeout
+     * - Unblock update
+     * - discard edit object
+     */
+    public void stopEdit() {
+        logger.info("Charge Profile editing - stop");
+        editingChargeProfile = false;
+        chargeProfileEdit = Optional.empty();
+    }
+
     public void switchRemoteServicesOff() {
         updateState(remoteLightChannel, OnOffType.from(false));
         updateState(remoteFinderChannel, OnOffType.from(false));
@@ -349,6 +430,8 @@ public class VehicleHandler extends VehicleChannelHandler {
         updateState(remoteHornChannel, OnOffType.from(false));
         updateState(remoteClimateChannel, OnOffType.from(false));
         updateState(remoteStateChannel, OnOffType.from(false));
+        updateState(remoteChargeNowChannel, OnOffType.from(false));
+        updateState(remoteChargingCOntrolChannel, OnOffType.from(false));
     }
 
     private void startSchedule(int interval) {
@@ -443,9 +526,12 @@ public class VehicleHandler extends VehicleChannelHandler {
         @Override
         public void onResponse(Optional<String> content) {
             chargeProfileCache = content;
-            if (content.isPresent()) {
-                ChargeProfile cp = Converter.getGson().fromJson(content.get(), ChargeProfile.class);
-                updateChargeProfile(cp);
+            // in case of profile editing surpress updates
+            synchronized (chargeProfileCache) {
+                if (content.isPresent() && !editingChargeProfile) {
+                    ChargeProfileWrapper cpw = new ChargeProfileWrapper(content.get());
+                    updateChargeProfile(cpw);
+                }
             }
         }
 

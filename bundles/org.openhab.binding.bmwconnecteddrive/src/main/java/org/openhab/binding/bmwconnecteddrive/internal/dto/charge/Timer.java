@@ -14,9 +14,6 @@ package org.openhab.binding.bmwconnecteddrive.internal.dto.charge;
 
 import java.util.List;
 
-import org.openhab.binding.bmwconnecteddrive.internal.utils.Constants;
-import org.openhab.binding.bmwconnecteddrive.internal.utils.Converter;
-
 /**
  * The {@link Timer} Data Transfer Object
  *
@@ -27,26 +24,26 @@ public class Timer {
     public boolean timerEnabled;// ": false,
     public List<String> weekdays;
 
-    /**
-     * "MONDAY",
-     * "TUESDAY",
-     * "WEDNESDAY",
-     * "THURSDAY",
-     * "FRIDAY"
-     * ] '
-     */
-    public String getDays() {
-        if (weekdays == null) {
-            return Converter.toTitleCase(Constants.UNKNOWN);
-        }
-        StringBuffer days = new StringBuffer();
-        weekdays.forEach(entry -> {
-            if (days.length() == 0) {
-                days.append(Constants.DAYS.get(entry));
-            } else {
-                days.append(Constants.COMMA).append(Constants.DAYS.get(entry));
-            }
-        });
-        return days.toString();
-    }
+    // /**
+    // * "MONDAY",
+    // * "TUESDAY",
+    // * "WEDNESDAY",
+    // * "THURSDAY",
+    // * "FRIDAY"
+    // * ] '
+    // */
+    // public String getDays() {
+    // if (weekdays == null) {
+    // return Converter.toTitleCase(Constants.UNKNOWN);
+    // }
+    // StringBuffer days = new StringBuffer();
+    // weekdays.forEach(entry -> {
+    // if (days.length() == 0) {
+    // days.append(Constants.DAYS.get(entry));
+    // } else {
+    // days.append(Constants.COMMA).append(Constants.DAYS.get(entry));
+    // }
+    // });
+    // return days.toString();
+    // }
 }

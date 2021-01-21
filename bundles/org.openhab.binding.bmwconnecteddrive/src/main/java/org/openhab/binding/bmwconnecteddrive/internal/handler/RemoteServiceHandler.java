@@ -39,6 +39,7 @@ public class RemoteServiceHandler implements StringResponseCallback {
 
     // after 60 retries the state update will give up
     private static final String SERVICE_TYPE = "serviceType";
+    private static final String DATA = "data";
     private static final int GIVEUP_COUNTER = 6;
     private static final int STATE_UPDATE_SEC = HTTPConstants.HTTP_TIMEOUT_SEC + 1; // regular timeout + 1sec
     private int counter = 0;
@@ -69,7 +70,9 @@ public class RemoteServiceHandler implements StringResponseCallback {
         DOOR_LOCK("DOOR_LOCK"),
         DOOR_UNLOCK("DOOR_UNLOCK"),
         HORN("HORN_BLOW"),
-        AIR_CONDITIONING("CLIMATE_NOW");
+        AIR_CONDITIONING("CLIMATE_NOW"),
+        CHARGE_NOW("CHARGE_NOW"),
+        CHARGING_CONTROL("CHARGING_CONTROL");
 
         private final String service;
 
@@ -104,7 +107,7 @@ public class RemoteServiceHandler implements StringResponseCallback {
         }
     }
 
-    boolean execute(RemoteService service) {
+    boolean execute(RemoteService service, String... jsonData) {
         synchronized (this) {
             if (serviceExecuting.isPresent()) {
                 // only one service executing
@@ -114,6 +117,10 @@ public class RemoteServiceHandler implements StringResponseCallback {
         }
         MultiMap<String> dataMap = new MultiMap<String>();
         dataMap.add(SERVICE_TYPE, service.toString());
+        if (jsonData != null) {
+            dataMap.add(DATA, jsonData[0]);
+            logger.info("Send Remote Service data {}", jsonData[0]);
+        }
         proxy.post(serviceExecutionAPI, Optional.of(dataMap), this);
         return true;
     }

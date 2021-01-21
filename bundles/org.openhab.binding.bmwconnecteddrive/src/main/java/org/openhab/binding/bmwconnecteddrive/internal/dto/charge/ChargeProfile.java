@@ -19,4 +19,5 @@ package org.openhab.binding.bmwconnecteddrive.internal.dto.charge;
  */
 public class ChargeProfile {
     public WeeklyPlanner weeklyPlanner;
+    public WeeklyPlanner twoTimesTimer;
 }

@@ -1,0 +1,19 @@
+{
+	"twoTimesTimer": {
+		"climatizationEnabled": false,
+		"chargingMode": "IMMEDIATE_CHARGING",
+		"chargingPreferences": "CHARGING_WINDOW",
+		"timer1": {
+			"departureTime": "5:40",
+			"timerEnabled": true
+		},
+		"timer2": {
+			"departureTime": "13:30",
+			"timerEnabled": false
+		},
+		"preferredChargingWindow": {
+			"startTime": "00:00",
+			"endTime": "00:00"
+		}
+	}
+}

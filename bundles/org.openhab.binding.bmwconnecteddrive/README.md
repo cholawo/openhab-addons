@@ -240,22 +240,50 @@ See Description [Range vs Range Radius](#range-vs-range-radius) to get more info
 Valid for Electric and Hybrid Vehicles
 These are Read-only values.
 
-| Channel Label                      | Channel Group ID | Channel ID          | Type   | 
-|------------------------------------|------------------|---------------------|--------|
-| Air Conditioning at Departure Time | charge           | profile-climate     | Switch | 
-| Charging Mode for Profile          | charge           | profile-mode        | String | 
-| Charging Window Start Time         | charge           | window-start        | String | 
-| Charging Window End Time           | charge           | window-end          | String | 
-| Timer 1: Departure Time            | charge           | timer1-departure    | String | 
-| Timer 1: Scheduled Days            | charge           | timer1-days         | String | 
-| Timer 1: Enabled                   | charge           | timer1-enabled      | Switch | 
-| Timer 2: Departure Time            | charge           | timer2-departure    | String | 
-| Timer 2: Scheduled Days            | charge           | timer2-days         | String | 
-| Timer 2: Enabled                   | charge           | timer2-enabled      | Switch | 
-| Timer 3: Departure Time            | charge           | timer3-departure    | String | 
-| Timer 3: Scheduled Days            | charge           | timer3-days         | String | 
-| Timer 3: Enabled                   | charge           | timer3-enabled      | Switch | 
+| Channel Label                      | Channel Group ID | Channel ID               | Type   | 
+|------------------------------------|------------------|--------------------------|--------|
+| Air Conditioning at Departure Time | charge           | profile-climate          | Switch | 
+| Charging Mode for Profile          | charge           | profile-mode             | String | 
+| Charging Preferences for Profile   | charge           | profile-prefs            | String | 
+| Charging Window Start Time Hour    | charge           | window-start-hour        | Time   | 
+| Charging Window Start Time Minute  | charge           | window-start-minute      | Time   | 
+| Charging Window End Time Hour      | charge           | window-end-hour          | Time   | 
+| Charging Window End Time Minute    | charge           | window-end-minute        | Time   | 
+| Timer 1: Enabled                   | charge           | timer1-enabled           | Switch | 
+| Timer 1: Departure Time Hour       | charge           | timer1-departure-hour    | Time   | 
+| Timer 1: Departure Time Minute     | charge           | timer1-departure-minute  | Time   | 
+| Timer 1: Monday                    | charge           | timer1-day-mon           | Switch | 
+| Timer 1: Tuesday                   | charge           | timer1-day-tue           | Switch | 
+| Timer 1: Wednesday                 | charge           | timer1-day-wed           | Switch | 
+| Timer 1: Thursday                  | charge           | timer1-day-thu           | Switch | 
+| Timer 1: Friday                    | charge           | timer1-day-fri           | Switch | 
+| Timer 1: Saturday                  | charge           | timer1-day-sat           | Switch | 
+| Timer 1: Sunday                    | charge           | timer1-day-sun           | Switch | 
+| Timer 2: Enabled                   | charge           | timer2-enabled           | Switch | 
+| Timer 2: Departure Time Hour       | charge           | timer2-departure-hour    | Time   | 
+| Timer 2: Departure Time Minute     | charge           | timer2-departure-minute  | Time   | 
+| Timer 2: Monday                    | charge           | timer2-day-mon           | Switch | 
+| Timer 2: Tuesday                   | charge           | timer2-day-tue           | Switch | 
+| Timer 2: Wednesday                 | charge           | timer2-day-wed           | Switch | 
+| Timer 2: Thursday                  | charge           | timer2-day-thu           | Switch | 
+| Timer 2: Friday                    | charge           | timer2-day-fri           | Switch | 
+| Timer 2: Saturday                  | charge           | timer2-day-sat           | Switch | 
+| Timer 2: Sunday                    | charge           | timer2-day-sun           | Switch | 
+| Timer 3: Enabled                   | charge           | timer3-enabled           | Switch | 
+| Timer 3: Departure Time Hour       | charge           | timer3-departure-hour    | Time   | 
+| Timer 3: Departure Time Minute     | charge           | timer3-departure-minute  | Time   | 
+| Timer 3: Monday                    | charge           | timer3-day-mon           | Switch | 
+| Timer 3: Tuesday                   | charge           | timer3-day-tue           | Switch | 
+| Timer 3: Wednesday                 | charge           | timer3-day-wed           | Switch | 
+| Timer 3: Thursday                  | charge           | timer3-day-thu           | Switch | 
+| Timer 3: Friday                    | charge           | timer3-day-fri           | Switch | 
+| Timer 3: Saturday                  | charge           | timer3-day-sat           | Switch | 
+| Timer 3: Sunday                    | charge           | timer3-day-sun           | Switch | 
 
+Values for Charging Preferences:
+
+* IMMEDIATE_CHARGING
+* CHARGING_WINDOW
 
 #### Location
 
@@ -314,6 +342,8 @@ State *Executed* is the final State when Execution is finished.
 | Unlock Doors            | remote           | unlock              | Switch  |
 | Horn Blow               | remote           | horn                | Switch  |
 | Active Air Conditioning | remote           | climate             | Switch  |
+| Charge Now              | remote           | charge-now          | Switch  |
+| Charging Control        | remote           | charge-control      | Switch  |
 | Service Execution State | remote           | state               | STring  |
 
 #### Destinations
