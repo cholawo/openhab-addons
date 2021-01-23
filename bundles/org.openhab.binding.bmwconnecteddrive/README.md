@@ -239,7 +239,7 @@ See Description [Range vs Range Radius](#range-vs-range-radius) to get more info
 
 Valid for Electric and Hybrid Vehicles.
 The Charge Profile can be edited according to your needs.
-After editing is done the data has to be sent via [Remote Services Charging Control Channel](remote_services).
+After editing is done the data has to be sent via [Remote Services Charging Control Channel](remote-services).
 
 The *Mode* supports *immediate charging* and *delayed charging*.
 Immediate charging is starting the charge process as soon as the plug is connected.
