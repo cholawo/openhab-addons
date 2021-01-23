@@ -114,6 +114,9 @@ Switch                  i3Timer3DaysFri           "Timer 3 Days Fri"            
 Switch                  i3Timer3DaysSat           "Timer 3 Days Sat"                            <calendar>      (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#timer3-day-sat" } 
 Switch                  i3Timer3DaysSun           "Timer 3 Days Sun"                            <calendar>      (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#timer3-day-sun" } 
 Switch                  i3Timer3Enabled           "Timer 3 Enabled"                             <switch>        (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#timer3-enabled" }  
+Switch                  i3SingleEnabled           "Single Enabled"                              <switch>        (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#single-enabled" }  
+Number                  i3SingleDepartureHour     "Single Departure [%d %unit%]"                <time>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#single-departure-hour" } 
+Number                  i3SingleDepartureMinute   "Single Departure [%d %unit%]"                <time>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:charge#single-departure-minute" } 
 
 Image                   i3Image                   "Image"                                                       (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:image#png" }  
 String                  i3ImageViewport           "Image Viewport [%s]"                         <zoom>          (i3)        {channel="bmwconnecteddrive:BEV_REX:user:i3:image#view" }  

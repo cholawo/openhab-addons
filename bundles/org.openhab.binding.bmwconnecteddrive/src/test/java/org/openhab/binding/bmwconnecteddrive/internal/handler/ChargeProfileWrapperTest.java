@@ -114,6 +114,10 @@ public class ChargeProfileWrapperTest {
         cpw.setTime(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_HOUR, 9);
         cpw.setTime(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_MINUTE, 10);
         cpw.enableDisableTimer(3, true);
+
+        cpw.setTime(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_HOUR, 11);
+        cpw.setTime(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_MINUTE, 12);
+
         System.out.println(cpw.getJson());
     }
 }

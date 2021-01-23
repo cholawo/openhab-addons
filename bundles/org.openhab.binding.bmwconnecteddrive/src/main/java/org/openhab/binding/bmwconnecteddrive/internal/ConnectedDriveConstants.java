@@ -191,6 +191,9 @@ public class ConnectedDriveConstants {
     public static final String CHARGE_TIMER3_DAY_SAT = "timer3-day-sat";
     public static final String CHARGE_TIMER3_DAY_SUN = "timer3-day-sun";
     public static final String CHARGE_TIMER3_ENABLED = "timer3-enabled";
+    public static final String CHARGE_SINGLE_ENABLED = "single-enabled";
+    public static final String CHARGE_SINGLE_DEPARTURE_HOUR = "single-departure-hour";
+    public static final String CHARGE_SINGLE_DEPARTURE_MINUTE = "single-departure-minute";
 
     // Range
     public static final String RANGE_HYBRID = "hybrid";

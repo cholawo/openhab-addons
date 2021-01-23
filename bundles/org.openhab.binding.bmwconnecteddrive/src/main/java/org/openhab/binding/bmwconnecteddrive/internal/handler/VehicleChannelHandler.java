@@ -197,6 +197,9 @@ public class VehicleChannelHandler extends BaseThingHandler {
     protected ChannelUID timer3DaysFri;
     protected ChannelUID timer3DaysSat;
     protected ChannelUID timer3DaysSun;
+    protected ChannelUID singleTimerEnabled;
+    protected ChannelUID singleTimerDepartureHour;
+    protected ChannelUID singleTimerDepartureMinute;
     protected HashMap<String, String> channelDayMapping;
 
     // Troubleshooting
@@ -337,6 +340,10 @@ public class VehicleChannelHandler extends BaseThingHandler {
         timer3DaysFri = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE, CHARGE_TIMER3_DAY_FRI);
         timer3DaysSat = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE, CHARGE_TIMER3_DAY_SAT);
         timer3DaysSun = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE, CHARGE_TIMER3_DAY_SUN);
+        singleTimerEnabled = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE, CHARGE_SINGLE_ENABLED);
+        singleTimerDepartureHour = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE, CHARGE_SINGLE_DEPARTURE_HOUR);
+        singleTimerDepartureMinute = new ChannelUID(thing.getUID(), CHANNEL_GROUP_CHARGE,
+                CHARGE_SINGLE_DEPARTURE_MINUTE);
         channelDayMapping.put(CHARGE_TIMER1_DAY_MON, Constants.MONDAY);
         channelDayMapping.put(CHARGE_TIMER2_DAY_MON, Constants.MONDAY);
         channelDayMapping.put(CHARGE_TIMER3_DAY_MON, Constants.MONDAY);
@@ -601,6 +608,11 @@ public class VehicleChannelHandler extends BaseThingHandler {
             updateState(timer3DaysFri, OnOffType.from(cpw.isDaySelected(3, Constants.FRIDAY)));
             updateState(timer3DaysSat, OnOffType.from(cpw.isDaySelected(3, Constants.SATURDAY)));
             updateState(timer3DaysSun, OnOffType.from(cpw.isDaySelected(3, Constants.SUNDAY)));
+            updateState(singleTimerEnabled, OnOffType.from(cpw.isTimerEnabled(0)));
+            updateState(singleTimerDepartureHour, QuantityType
+                    .valueOf(cpw.getTime(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_HOUR), Units.HOUR));
+            updateState(singleTimerDepartureMinute, QuantityType
+                    .valueOf(cpw.getTime(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_MINUTE), Units.MINUTE));
         }
     }
 

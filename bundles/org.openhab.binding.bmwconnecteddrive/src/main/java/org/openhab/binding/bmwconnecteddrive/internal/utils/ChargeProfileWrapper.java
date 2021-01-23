@@ -57,27 +57,37 @@ public class ChargeProfileWrapper {
             planner = chargeProfile.twoTimesTimer;
             // timer days not supported
         } else {
+            type = EMPTY;
             planner = new WeeklyPlanner();
         }
-        // variables for both ChargeProfile types
 
-        String[] chargeWindowStartSplit = planner.preferredChargingWindow.startTime.split(Constants.COLON);
-        timers.put(ConnectedDriveConstants.CHARGE_WINDOW_START_HOUR, Integer.parseInt(chargeWindowStartSplit[0]));
-        timers.put(ConnectedDriveConstants.CHARGE_WINDOW_START_MINUTE, Integer.parseInt(chargeWindowStartSplit[1]));
-        String[] chargeWindowEndSplit = planner.preferredChargingWindow.endTime.split(Constants.COLON);
-        timers.put(ConnectedDriveConstants.CHARGE_WINDOW_END_HOUR, Integer.parseInt(chargeWindowEndSplit[0]));
-        timers.put(ConnectedDriveConstants.CHARGE_WINDOW_END_MINUTE, Integer.parseInt(chargeWindowEndSplit[1]));
-        String[] timer1DepartureSplit = planner.timer1.departureTime.split(Constants.COLON);
-        timers.put(ConnectedDriveConstants.CHARGE_TIMER1_DEPARTURE_HOUR, Integer.parseInt(timer1DepartureSplit[0]));
-        timers.put(ConnectedDriveConstants.CHARGE_TIMER1_DEPARTURE_MINUTE, Integer.parseInt(timer1DepartureSplit[1]));
-        String[] timer2DepartureSplit = planner.timer2.departureTime.split(Constants.COLON);
-        timers.put(ConnectedDriveConstants.CHARGE_TIMER2_DEPARTURE_HOUR, Integer.parseInt(timer2DepartureSplit[0]));
-        timers.put(ConnectedDriveConstants.CHARGE_TIMER2_DEPARTURE_MINUTE, Integer.parseInt(timer2DepartureSplit[1]));
-        if (type == WEEKLY) {
-            String[] timer3DepartureSplit = planner.timer3.departureTime.split(Constants.COLON);
-            timers.put(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_HOUR, Integer.parseInt(timer3DepartureSplit[0]));
-            timers.put(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_MINUTE,
-                    Integer.parseInt(timer3DepartureSplit[1]));
+        if (type != EMPTY) {
+            String[] chargeWindowStartSplit = planner.preferredChargingWindow.startTime.split(Constants.COLON);
+            timers.put(ConnectedDriveConstants.CHARGE_WINDOW_START_HOUR, Integer.parseInt(chargeWindowStartSplit[0]));
+            timers.put(ConnectedDriveConstants.CHARGE_WINDOW_START_MINUTE, Integer.parseInt(chargeWindowStartSplit[1]));
+            String[] chargeWindowEndSplit = planner.preferredChargingWindow.endTime.split(Constants.COLON);
+            timers.put(ConnectedDriveConstants.CHARGE_WINDOW_END_HOUR, Integer.parseInt(chargeWindowEndSplit[0]));
+            timers.put(ConnectedDriveConstants.CHARGE_WINDOW_END_MINUTE, Integer.parseInt(chargeWindowEndSplit[1]));
+            String[] timer1DepartureSplit = planner.timer1.departureTime.split(Constants.COLON);
+            timers.put(ConnectedDriveConstants.CHARGE_TIMER1_DEPARTURE_HOUR, Integer.parseInt(timer1DepartureSplit[0]));
+            timers.put(ConnectedDriveConstants.CHARGE_TIMER1_DEPARTURE_MINUTE,
+                    Integer.parseInt(timer1DepartureSplit[1]));
+            String[] timer2DepartureSplit = planner.timer2.departureTime.split(Constants.COLON);
+            timers.put(ConnectedDriveConstants.CHARGE_TIMER2_DEPARTURE_HOUR, Integer.parseInt(timer2DepartureSplit[0]));
+            timers.put(ConnectedDriveConstants.CHARGE_TIMER2_DEPARTURE_MINUTE,
+                    Integer.parseInt(timer2DepartureSplit[1]));
+            if (type == WEEKLY) {
+                String[] timer3DepartureSplit = planner.timer3.departureTime.split(Constants.COLON);
+                timers.put(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_HOUR,
+                        Integer.parseInt(timer3DepartureSplit[0]));
+                timers.put(ConnectedDriveConstants.CHARGE_TIMER3_DEPARTURE_MINUTE,
+                        Integer.parseInt(timer3DepartureSplit[1]));
+                String[] singleDepartureSplit = planner.overrideTimer.departureTime.split(Constants.COLON);
+                timers.put(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_HOUR,
+                        Integer.parseInt(singleDepartureSplit[0]));
+                timers.put(ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_MINUTE,
+                        Integer.parseInt(singleDepartureSplit[1]));
+            }
         }
     }
 
@@ -138,6 +148,17 @@ public class ChargeProfileWrapper {
                 if (type == WEEKLY) {
                     split = planner.timer3.departureTime.split(Constants.COLON);
                     planner.timer3.departureTime = split[0] + Constants.COLON + time;
+                }
+            case ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_HOUR:
+                if (type == WEEKLY) {
+                    split = planner.overrideTimer.departureTime.split(Constants.COLON);
+                    planner.overrideTimer.departureTime = time + Constants.COLON + split[1];
+                }
+                break;
+            case ConnectedDriveConstants.CHARGE_SINGLE_DEPARTURE_MINUTE:
+                if (type == WEEKLY) {
+                    split = planner.overrideTimer.departureTime.split(Constants.COLON);
+                    planner.overrideTimer.departureTime = split[0] + Constants.COLON + time;
                 }
                 break;
         }

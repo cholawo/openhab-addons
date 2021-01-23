@@ -44,6 +44,9 @@
 			<channel id="timer3-day-sat" typeId="timer3-days-sat-channel"/>
 			<channel id="timer3-day-sun" typeId="timer3-days-sun-channel"/>
 			<channel id="timer3-enabled" typeId="timer3-enabled-channel"/>
+			<channel id="single-enabled" typeId="single-enabled-channel"/>
+			<channel id="single-departure-hour" typeId="single-departure-hour-channel"/>
+			<channel id="single-departure-minute" typeId="single-departure-minute-channel"/>
 		</channels>
 	</channel-group-type>
 </thing:thing-descriptions>

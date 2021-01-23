@@ -237,53 +237,82 @@ See Description [Range vs Range Radius](#range-vs-range-radius) to get more info
 
 #### Charge Profile
 
-Valid for Electric and Hybrid Vehicles
-These are Read-only values.
+Valid for Electric and Hybrid Vehicles.
+The Charge Profile can be edited according to your needs.
+After editing is done the data has to be sent via [Remote Services Charging Control Channel](remote_services).
 
-| Channel Label                      | Channel Group ID | Channel ID               | Type   | 
-|------------------------------------|------------------|--------------------------|--------|
-| Air Conditioning at Departure Time | charge           | profile-climate          | Switch | 
-| Charging Mode for Profile          | charge           | profile-mode             | String | 
-| Charging Preferences for Profile   | charge           | profile-prefs            | String | 
-| Charging Window Start Time Hour    | charge           | window-start-hour        | Time   | 
-| Charging Window Start Time Minute  | charge           | window-start-minute      | Time   | 
-| Charging Window End Time Hour      | charge           | window-end-hour          | Time   | 
-| Charging Window End Time Minute    | charge           | window-end-minute        | Time   | 
-| Timer 1: Enabled                   | charge           | timer1-enabled           | Switch | 
-| Timer 1: Departure Time Hour       | charge           | timer1-departure-hour    | Time   | 
-| Timer 1: Departure Time Minute     | charge           | timer1-departure-minute  | Time   | 
-| Timer 1: Monday                    | charge           | timer1-day-mon           | Switch | 
-| Timer 1: Tuesday                   | charge           | timer1-day-tue           | Switch | 
-| Timer 1: Wednesday                 | charge           | timer1-day-wed           | Switch | 
-| Timer 1: Thursday                  | charge           | timer1-day-thu           | Switch | 
-| Timer 1: Friday                    | charge           | timer1-day-fri           | Switch | 
-| Timer 1: Saturday                  | charge           | timer1-day-sat           | Switch | 
-| Timer 1: Sunday                    | charge           | timer1-day-sun           | Switch | 
-| Timer 2: Enabled                   | charge           | timer2-enabled           | Switch | 
-| Timer 2: Departure Time Hour       | charge           | timer2-departure-hour    | Time   | 
-| Timer 2: Departure Time Minute     | charge           | timer2-departure-minute  | Time   | 
-| Timer 2: Monday                    | charge           | timer2-day-mon           | Switch | 
-| Timer 2: Tuesday                   | charge           | timer2-day-tue           | Switch | 
-| Timer 2: Wednesday                 | charge           | timer2-day-wed           | Switch | 
-| Timer 2: Thursday                  | charge           | timer2-day-thu           | Switch | 
-| Timer 2: Friday                    | charge           | timer2-day-fri           | Switch | 
-| Timer 2: Saturday                  | charge           | timer2-day-sat           | Switch | 
-| Timer 2: Sunday                    | charge           | timer2-day-sun           | Switch | 
-| Timer 3: Enabled                   | charge           | timer3-enabled           | Switch | 
-| Timer 3: Departure Time Hour       | charge           | timer3-departure-hour    | Time   | 
-| Timer 3: Departure Time Minute     | charge           | timer3-departure-minute  | Time   | 
-| Timer 3: Monday                    | charge           | timer3-day-mon           | Switch | 
-| Timer 3: Tuesday                   | charge           | timer3-day-tue           | Switch | 
-| Timer 3: Wednesday                 | charge           | timer3-day-wed           | Switch | 
-| Timer 3: Thursday                  | charge           | timer3-day-thu           | Switch | 
-| Timer 3: Friday                    | charge           | timer3-day-fri           | Switch | 
-| Timer 3: Saturday                  | charge           | timer3-day-sat           | Switch | 
-| Timer 3: Sunday                    | charge           | timer3-day-sun           | Switch | 
+The *Mode* supports *immediate charging* and *delayed charging*.
+Immediate charging is starting the charge process as soon as the plug is connected.
+Delayed charging has some conditions:
 
-Values for Charging Preferences:
+* at least one timer needs to be activated 
+* charging will only start if the start time reached
+* if full charge isn't reached between *charge window end time* and *next departure time* charging will continue!
+
+Automatic air conditioning can be set regardless of the selected charging mode.
+Activating this at least one timer needs to be enabled.
+So it's possible to set the mode to *immediate* charging but air conditioning is respecting the enabled timer configuration.
+
+If the Single Timer is configured the other timers 1-3 will not be taken into account.
+This may be useful to schedule e.g. for holiday leave.
+As restriction from the BMW App the single timer needs to be configured at least + 10 minutes from the current time.
+
+Due to the fact that you are able to modify the charge profile within the UI you need to be **careful with your rules**.
+If a rule is applying changes while you're manually editing there's the possibility that unwanted or even inconsistent data will be transmitted.
+This results into
+
+* the BMW server will reject your changes or
+* partially edited data will be transmitted or edited data will be overridden 
+
+
+| Channel Label                       | Channel Group ID | Channel ID               | Type   | 
+|-------------------------------------|------------------|--------------------------|--------|
+| Charging Mode for Profile           | charge           | profile-mode             | String | 
+| Charging Preferences for Profile    | charge           | profile-prefs            | String | 
+| Charging Window Start Time Hour     | charge           | window-start-hour        | Time   | 
+| Charging Window Start Time Minute   | charge           | window-start-minute      | Time   | 
+| Charging Window End Time Hour       | charge           | window-end-hour          | Time   | 
+| Charging Window End Time Minute     | charge           | window-end-minute        | Time   | 
+| Air Conditioning at Departure Time  | charge           | profile-climate          | Switch | 
+| Timer 1: Enabled                    | charge           | timer1-enabled           | Switch | 
+| Timer 1: Departure Time Hour        | charge           | timer1-departure-hour    | Time   | 
+| Timer 1: Departure Time Minute      | charge           | timer1-departure-minute  | Time   | 
+| Timer 1: Monday                     | charge           | timer1-day-mon           | Switch | 
+| Timer 1: Tuesday                    | charge           | timer1-day-tue           | Switch | 
+| Timer 1: Wednesday                  | charge           | timer1-day-wed           | Switch | 
+| Timer 1: Thursday                   | charge           | timer1-day-thu           | Switch | 
+| Timer 1: Friday                     | charge           | timer1-day-fri           | Switch | 
+| Timer 1: Saturday                   | charge           | timer1-day-sat           | Switch | 
+| Timer 1: Sunday                     | charge           | timer1-day-sun           | Switch | 
+| Timer 2: Enabled                    | charge           | timer2-enabled           | Switch | 
+| Timer 2: Departure Time Hour        | charge           | timer2-departure-hour    | Time   | 
+| Timer 2: Departure Time Minute      | charge           | timer2-departure-minute  | Time   | 
+| Timer 2: Monday                     | charge           | timer2-day-mon           | Switch | 
+| Timer 2: Tuesday                    | charge           | timer2-day-tue           | Switch | 
+| Timer 2: Wednesday                  | charge           | timer2-day-wed           | Switch | 
+| Timer 2: Thursday                   | charge           | timer2-day-thu           | Switch | 
+| Timer 2: Friday                     | charge           | timer2-day-fri           | Switch | 
+| Timer 2: Saturday                   | charge           | timer2-day-sat           | Switch | 
+| Timer 2: Sunday                     | charge           | timer2-day-sun           | Switch | 
+| Timer 3: Enabled                    | charge           | timer3-enabled           | Switch | 
+| Timer 3: Departure Time Hour        | charge           | timer3-departure-hour    | Time   | 
+| Timer 3: Departure Time Minute      | charge           | timer3-departure-minute  | Time   | 
+| Timer 3: Monday                     | charge           | timer3-day-mon           | Switch | 
+| Timer 3: Tuesday                    | charge           | timer3-day-tue           | Switch | 
+| Timer 3: Wednesday                  | charge           | timer3-day-wed           | Switch | 
+| Timer 3: Thursday                   | charge           | timer3-day-thu           | Switch | 
+| Timer 3: Friday                     | charge           | timer3-day-fri           | Switch | 
+| Timer 3: Saturday                   | charge           | timer3-day-sat           | Switch | 
+| Timer 3: Sunday                     | charge           | timer3-day-sun           | Switch | 
+| Single Timer: Departure Time Hour   | charge           | timer3-departure-hour    | Time   | 
+| Single Timer: Departure Time Minute | charge           | timer3-departure-minute  | Time   | 
+
+Values for Charging Mode:
 
 * IMMEDIATE_CHARGING
-* CHARGING_WINDOW
+* DELAYED_CHARGING - charging Window is taken into account
+
+
 
 #### Location
 

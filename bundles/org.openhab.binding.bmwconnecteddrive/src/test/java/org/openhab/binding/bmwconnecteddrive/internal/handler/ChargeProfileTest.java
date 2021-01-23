@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class ChargeProfileTest {
     private final Logger logger = LoggerFactory.getLogger(VehicleHandler.class);
 
-    private static final int PROFILE_CALLBACK_NUMBER = 37;
+    private static final int PROFILE_CALLBACK_NUMBER = 40;
 
     @Nullable
     ArgumentCaptor<ChannelUID> channelCaptor;

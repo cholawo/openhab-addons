@@ -162,7 +162,9 @@ public class VehicleHandler extends VehicleChannelHandler {
             String channelName = channelUID.getIdWithoutGroup();
             // block updates from now on and create object for editing
             synchronized (chargeProfileCache) {
-                editingChargeProfile = true;
+                if (chargeProfileCache.isPresent()) {
+                    editingChargeProfile = true;
+                }
             }
             if (!chargeProfileEdit.isPresent()) {
                 if (chargeProfileCache.isPresent()) {
@@ -182,7 +184,7 @@ public class VehicleHandler extends VehicleChannelHandler {
                     chargeProfileEdit.get().setChargePreferences(command.toFullString());
                 } else if (channelName.startsWith("window")) {
                     chargeProfileEdit.get().setTime(channelName, ((DecimalType) command).intValue());
-                } else if (channelName.startsWith("timer")) {
+                } else if (channelName.startsWith("timer") || channelName.startsWith("single")) {
                     int timerId = 0;
                     if (channelName.startsWith("timer1")) {
                         timerId = 1;

@@ -10,6 +10,12 @@
 	<channel-type id="profile-mode-channel">
 		<item-type>String</item-type>
 		<label>Charging Mode</label>
+		<command>
+			<options>
+				<option value="IMMEDIATE_CHARGING">Immediate Charging</option>
+				<option value="DELAYED_CHARGING">Delayed Charging</option>
+			</options>
+		</command>
 	</channel-type>
 	<channel-type id="profile-prefs-channel">
 		<item-type>String</item-type>
@@ -151,4 +157,17 @@
 		<item-type>Switch</item-type>
 		<label>Timer 3: Enabled</label>
 	</channel-type>
+	<channel-type id="single-enabled-channel">
+		<item-type>Switch</item-type>
+		<label>Single Timer: Enabled</label>
+	</channel-type>
+	<channel-type id="single-departure-hour-channel">
+		<item-type>Number:Time</item-type>
+		<label>Single Timer: Departure Time Hour</label>
+	</channel-type>
+	<channel-type id="single-departure-minute-channel">
+		<item-type>Number:Time</item-type>
+		<label>Single: Departure Time Minute</label>
+	</channel-type>
+
 </thing:thing-descriptions>
