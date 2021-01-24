@@ -239,23 +239,45 @@ See Description [Range vs Range Radius](#range-vs-range-radius) to get more info
 
 Valid for Electric and Hybrid Vehicles.
 The Charge Profile can be edited according to your needs.
-After editing is done the data has to be sent via [Remote Services Charging Control Channel](#remote-services).
+After each value edit updates of the charging profile are avoided for 5 minutes.
+This is enough time to change all settings according to your needs.
+Finally the data has to be sent via [Remote Services Charging Control Channel](#remote-services).
+After transmission charge profile is updated regularly.
+
+##### When to charge?
 
 The *Mode* supports *immediate charging* and *delayed charging*.
 Immediate charging is starting the charge process as soon as the plug is connected.
 Delayed charging has some conditions:
 
 * at least one timer needs to be activated 
+* definition of start / end times of the timing window
 * charging will only start if the start time reached
 * if full charge isn't reached between *charge window end time* and *next departure time* charging will continue!
+
+##### Air conditioning at departure?
 
 Automatic air conditioning can be set regardless of the selected charging mode.
 Activating this at least one timer needs to be enabled.
 So it's possible to set the mode to *immediate* charging but air conditioning is respecting the enabled timer configuration.
 
+
+##### Regular Departures
+
+There are 3 timers available to schedule your regular departures for e.g. drive to work or regular evening classes.
+All timers have the same setup:
+
+* enabled / disabled
+* departure time with hour and minute
+* days of week 
+
+##### Single Departure
+
 If the Single Timer is configured the other timers 1-3 will not be taken into account.
 This may be useful to schedule e.g. for holiday leave.
 As restriction from the BMW App the single timer needs to be configured at least + 10 minutes from the current time.
+
+##### Rules
 
 Due to the fact that you are able to modify the charge profile within the UI you need to be **careful with your rules**.
 If a rule is applying changes while you're manually editing there's the possibility that unwanted or even inconsistent data will be transmitted.
