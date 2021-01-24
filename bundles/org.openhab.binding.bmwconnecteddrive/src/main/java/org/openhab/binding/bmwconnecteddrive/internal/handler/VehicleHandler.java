@@ -105,7 +105,7 @@ public class VehicleHandler extends VehicleChannelHandler {
             } else if (CHANNEL_GROUP_STATUS.equals(group)) {
                 vehicleStatusCallback.onResponse(vehicleStatusCache);
             } else if (CHANNEL_GROUP_CHARGE.equals(group)) {
-                vehicleStatusCallback.onResponse(chargeProfileCache);
+                chargeProfileCallback.onResponse(chargeProfileCache);
             } else if (CHANNEL_GROUP_TROUBLESHOOT.equals(group)) {
                 imageCallback.onResponse(imageCache);
             }
