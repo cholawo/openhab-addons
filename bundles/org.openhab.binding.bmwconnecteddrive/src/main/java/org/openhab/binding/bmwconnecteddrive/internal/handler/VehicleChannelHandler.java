@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2020 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -596,8 +596,6 @@ public class VehicleChannelHandler extends BaseThingHandler {
         final TimedChannels channels = timedChannels.get(key);
         if (channels != null) {
             final LocalTime time = profile.getTime(key);
-            // updateState(channels.time, time == null ? UnDefType.UNDEF :
-            // StringType.valueOf(time.format(TIMEFORMATER)));
             updateState(channels.time, time == null ? UnDefType.UNDEF
                     : new DateTimeType(ZonedDateTime.of(Constants.EPOCHDAY, time, ZoneId.systemDefault())));
             updateState(channels.hour, time == null ? UnDefType.UNDEF : new DecimalType(time.getHour()));
