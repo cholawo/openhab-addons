@@ -156,6 +156,7 @@ public class VehicleChannelHandler extends BaseThingHandler {
 
     // Charging
     protected ChannelUID chargingStatus;
+    protected ChannelUID chargingTimeRemaining;
     protected ChannelUID chargeProfileClimate;
     protected ChannelUID chargeProfileChargeMode;
     protected ChannelUID chargeProfilePreference;
@@ -241,6 +242,7 @@ public class VehicleChannelHandler extends BaseThingHandler {
         serviceNextMileage = new ChannelUID(thing.getUID(), CHANNEL_GROUP_STATUS, SERVICE_MILEAGE);
         checkControl = new ChannelUID(thing.getUID(), CHANNEL_GROUP_STATUS, CHECK_CONTROL);
         chargingStatus = new ChannelUID(thing.getUID(), CHANNEL_GROUP_STATUS, CHARGE_STATUS);
+        chargingTimeRemaining = new ChannelUID(thing.getUID(), CHANNEL_GROUP_STATUS, CHARGE_REMAINING);
         lastUpdate = new ChannelUID(thing.getUID(), CHANNEL_GROUP_STATUS, LAST_UPDATE);
 
         serviceDate = new ChannelUID(thing.getUID(), CHANNEL_GROUP_SERVICE, DATE);
@@ -579,6 +581,10 @@ public class VehicleChannelHandler extends BaseThingHandler {
         updateState(tripAvgRecuperation, QuantityType.valueOf(Converter.round(avgRecuperation), Units.KILOWATT_HOUR));
     }
 
+    protected void updateChargeProfileFromContent(Optional<String> content) {
+        content.flatMap(cont -> ChargeProfileWrapper.fromJson(cont)).ifPresent(wrapper -> updateChargeProfile(wrapper));
+    }
+
     protected void updateChargeProfile(ChargeProfileWrapper wrapper) {
         updateState(chargeProfilePreference, StringType.valueOf(Converter.toTitleCase(wrapper.getPreference())));
         updateState(chargeProfileChargeMode, StringType.valueOf(Converter.toTitleCase(wrapper.getMode())));
@@ -597,7 +603,7 @@ public class VehicleChannelHandler extends BaseThingHandler {
         if (channels != null) {
             final LocalTime time = profile.getTime(key);
             updateState(channels.time, time == null ? UnDefType.UNDEF
-                    : new DateTimeType(ZonedDateTime.of(Constants.EPOCHDAY, time, ZoneId.systemDefault())));
+                    : new DateTimeType(ZonedDateTime.of(Constants.EPOCH_DAY, time, ZoneId.systemDefault())));
             updateState(channels.hour, time == null ? UnDefType.UNDEF : new DecimalType(time.getHour()));
             updateState(channels.minute, time == null ? UnDefType.UNDEF : new DecimalType(time.getMinute()));
             if (channels instanceof TimerChannels) {
@@ -756,6 +762,18 @@ public class VehicleChannelHandler extends BaseThingHandler {
                     // State INVALID is somehow misleading. Instead show the Last Charging End Reason
                     updateState(chargingStatus, StringType.valueOf(Converter.toTitleCase(vStatus.chargingStatus)));
                 }
+            } else {
+                updateState(chargingStatus, UnDefType.NULL);
+            }
+            if (vStatus.chargingTimeRemaining != null) {
+                try {
+                    updateState(chargingTimeRemaining,
+                            QuantityType.valueOf(vStatus.chargingTimeRemaining, Units.MINUTE));
+                } catch (NumberFormatException nfe) {
+                    updateState(chargingTimeRemaining, UnDefType.UNDEF);
+                }
+            } else {
+                updateState(chargingTimeRemaining, UnDefType.NULL);
             }
         }
     }
