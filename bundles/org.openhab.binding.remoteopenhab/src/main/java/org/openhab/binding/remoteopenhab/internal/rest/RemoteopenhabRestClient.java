@@ -13,6 +13,7 @@
 package org.openhab.binding.remoteopenhab.internal.rest;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -90,6 +92,7 @@ public class RemoteopenhabRestClient {
     private String accessToken;
     private boolean trustedCertificate;
     private boolean connected;
+    private boolean completed;
 
     private @Nullable SseEventSource eventSource;
     private long lastEventTimestamp;
@@ -181,7 +184,7 @@ public class RemoteopenhabRestClient {
     public void sendCommandToRemoteItem(String itemName, Command command) throws RemoteopenhabException {
         try {
             String url = String.format("%s/%s", getRestApiUrl("items"), itemName);
-            executeUrl(HttpMethod.POST, url, "application/json", command.toFullString(), "text/plain", false);
+            executeUrl(HttpMethod.POST, url, "application/json", command.toFullString(), "text/plain", false, true);
         } catch (RemoteopenhabException e) {
             throw new RemoteopenhabException("Failed to send command to the remote item " + itemName
                     + " using the items REST API: " + e.getMessage(), e);
@@ -237,10 +240,10 @@ public class RemoteopenhabRestClient {
         }
     }
 
-    public void stop() {
+    public void stop(boolean waitingForCompletion) {
         synchronized (startStopLock) {
             logger.debug("Closing EventSource");
-            closeEventSource(0, TimeUnit.SECONDS);
+            closeEventSource(waitingForCompletion);
             logger.debug("EventSource stopped");
             lastEventTimestamp = 0;
         }
@@ -263,7 +266,7 @@ public class RemoteopenhabRestClient {
                     .register(new RemoteopenhabStreamingRequestFilter(accessToken)).build();
         }
         SseEventSource eventSource = eventSourceFactory.newSource(client.target(restSseUrl));
-        eventSource.register(this::onEvent, this::onError);
+        eventSource.register(this::onEvent, this::onError, this::onComplete);
         return eventSource;
     }
 
@@ -279,7 +282,7 @@ public class RemoteopenhabRestClient {
             return;
         }
 
-        closeEventSource(10, TimeUnit.SECONDS);
+        closeEventSource(true);
 
         logger.debug("Opening new EventSource {}", url);
         SseEventSource localEventSource = createEventSource(url);
@@ -288,12 +291,12 @@ public class RemoteopenhabRestClient {
         eventSource = localEventSource;
     }
 
-    private void closeEventSource(long timeout, TimeUnit timeoutUnit) {
+    private void closeEventSource(boolean waitingForCompletion) {
         SseEventSource localEventSource = eventSource;
         if (localEventSource != null) {
-            if (!localEventSource.isOpen()) {
+            if (!localEventSource.isOpen() || completed) {
                 logger.debug("Existing EventSource is already closed");
-            } else if (localEventSource.close(timeout, timeoutUnit)) {
+            } else if (localEventSource.close(waitingForCompletion ? 10 : 0, TimeUnit.SECONDS)) {
                 logger.debug("Succesfully closed existing EventSource");
             } else {
                 logger.debug("Failed to close existing EventSource");
@@ -435,6 +438,12 @@ public class RemoteopenhabRestClient {
         }
     }
 
+    private void onComplete() {
+        logger.debug("Disconnected from streaming events");
+        completed = true;
+        listeners.forEach(listener -> listener.onDisconnected());
+    }
+
     private void onError(Throwable error) {
         logger.debug("Error occurred while receiving events", error);
         listeners.forEach(listener -> listener.onError("Error occurred while receiving events"));
@@ -463,11 +472,11 @@ public class RemoteopenhabRestClient {
     }
 
     public String executeGetUrl(String url, String acceptHeader, boolean asyncReading) throws RemoteopenhabException {
-        return executeUrl(HttpMethod.GET, url, acceptHeader, null, null, asyncReading);
+        return executeUrl(HttpMethod.GET, url, acceptHeader, null, null, asyncReading, true);
     }
 
     public String executeUrl(HttpMethod httpMethod, String url, String acceptHeader, @Nullable String content,
-            @Nullable String contentType, boolean asyncReading) throws RemoteopenhabException {
+            @Nullable String contentType, boolean asyncReading, boolean retryIfEOF) throws RemoteopenhabException {
         final Request request = httpClient.newRequest(url).method(httpMethod).timeout(REQUEST_TIMEOUT,
                 TimeUnit.MILLISECONDS);
 
@@ -510,6 +519,16 @@ public class RemoteopenhabRestClient {
             }
         } catch (RemoteopenhabException e) {
             throw e;
+        } catch (ExecutionException e) {
+            // After a long network outage, the first HTTP request will fail with an EOFException exception.
+            // We retry the request a second time in this case.
+            Throwable cause = e.getCause();
+            if (retryIfEOF && cause instanceof EOFException) {
+                logger.debug("EOFException - retry the request");
+                return executeUrl(httpMethod, url, acceptHeader, content, contentType, asyncReading, false);
+            } else {
+                throw new RemoteopenhabException(e);
+            }
         } catch (Exception e) {
             throw new RemoteopenhabException(e);
         }
