@@ -14,6 +14,7 @@ package org.openhab.binding.bmwconnecteddrive.internal.handler;
 
 import static org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConstants.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.measure.quantity.Length;
 
@@ -581,8 +583,8 @@ public class VehicleChannelHandler extends BaseThingHandler {
         updateState(tripAvgRecuperation, QuantityType.valueOf(Converter.round(avgRecuperation), Units.KILOWATT_HOUR));
     }
 
-    protected void updateChargeProfileFromContent(Optional<String> content) {
-        content.flatMap(cont -> ChargeProfileWrapper.fromJson(cont)).ifPresent(wrapper -> updateChargeProfile(wrapper));
+    protected void updateChargeProfileFromContent(String content) {
+        ChargeProfileWrapper.fromJson(content).ifPresent(wrapper -> updateChargeProfile(wrapper));
     }
 
     protected void updateChargeProfile(ChargeProfileWrapper wrapper) {
@@ -611,14 +613,14 @@ public class VehicleChannelHandler extends BaseThingHandler {
                 updateState(((TimerChannels) channels).enabled,
                         enabled == null ? UnDefType.UNDEF : OnOffType.from(enabled));
                 if (channels instanceof TimerDaysChannels) {
-                    final List<String> days = profile.getDays(key);
-                    final Boolean mon = profile.isDayEnabled(key, Day.MONDAY);
-                    final Boolean tue = profile.isDayEnabled(key, Day.TUESDAY);
-                    final Boolean wed = profile.isDayEnabled(key, Day.WEDNESDAY);
-                    final Boolean thu = profile.isDayEnabled(key, Day.THURSDAY);
-                    final Boolean fri = profile.isDayEnabled(key, Day.FRIDAY);
-                    final Boolean sat = profile.isDayEnabled(key, Day.SATURDAY);
-                    final Boolean sun = profile.isDayEnabled(key, Day.SUNDAY);
+                    final Set<DayOfWeek> days = profile.getDays(key);
+                    final Boolean mon = profile.isDayEnabled(key, DayOfWeek.MONDAY);
+                    final Boolean tue = profile.isDayEnabled(key, DayOfWeek.TUESDAY);
+                    final Boolean wed = profile.isDayEnabled(key, DayOfWeek.WEDNESDAY);
+                    final Boolean thu = profile.isDayEnabled(key, DayOfWeek.THURSDAY);
+                    final Boolean fri = profile.isDayEnabled(key, DayOfWeek.FRIDAY);
+                    final Boolean sat = profile.isDayEnabled(key, DayOfWeek.SATURDAY);
+                    final Boolean sun = profile.isDayEnabled(key, DayOfWeek.SUNDAY);
                     updateState(((TimerDaysChannels) channels).days,
                             days == null ? UnDefType.UNDEF : StringType.valueOf(ChargeProfileUtils.formatDays(days)));
                     updateState(((TimerDaysChannels) channels).mon,

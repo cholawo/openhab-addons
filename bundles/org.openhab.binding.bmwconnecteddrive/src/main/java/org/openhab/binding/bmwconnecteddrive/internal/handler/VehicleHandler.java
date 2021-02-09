@@ -14,6 +14,7 @@ package org.openhab.binding.bmwconnecteddrive.internal.handler;
 
 import static org.openhab.binding.bmwconnecteddrive.internal.ConnectedDriveConstants.*;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.bmwconnecteddrive.internal.VehicleConfiguration;
 import org.openhab.binding.bmwconnecteddrive.internal.action.ChargeProfileActions;
 import org.openhab.binding.bmwconnecteddrive.internal.dto.DestinationContainer;
@@ -102,13 +104,13 @@ public class VehicleHandler extends VehicleChannelHandler {
     }
 
     private static class ChargeKeyDay {
-        ChargeKeyDay(final ProfileKey key, final Day day) {
+        ChargeKeyDay(final ProfileKey key, final DayOfWeek day) {
             this.key = key;
             this.day = day;
         }
 
         final ProfileKey key;
-        final Day day;
+        final DayOfWeek day;
     }
 
     @SuppressWarnings("serial")
@@ -142,27 +144,27 @@ public class VehicleHandler extends VehicleChannelHandler {
     @SuppressWarnings("serial")
     private static final Map<String, ChargeKeyDay> chargeDayChannelKeys = new HashMap<>() {
         {
-            put(CHARGE_TIMER1_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER1, Day.MONDAY));
-            put(CHARGE_TIMER1_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER1, Day.TUESDAY));
-            put(CHARGE_TIMER1_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER1, Day.WEDNESDAY));
-            put(CHARGE_TIMER1_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER1, Day.THURSDAY));
-            put(CHARGE_TIMER1_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER1, Day.FRIDAY));
-            put(CHARGE_TIMER1_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER1, Day.SATURDAY));
-            put(CHARGE_TIMER1_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER1, Day.SUNDAY));
-            put(CHARGE_TIMER2_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER2, Day.MONDAY));
-            put(CHARGE_TIMER2_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER2, Day.TUESDAY));
-            put(CHARGE_TIMER2_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER2, Day.WEDNESDAY));
-            put(CHARGE_TIMER2_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER2, Day.THURSDAY));
-            put(CHARGE_TIMER2_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER2, Day.FRIDAY));
-            put(CHARGE_TIMER2_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER2, Day.SATURDAY));
-            put(CHARGE_TIMER2_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER2, Day.SUNDAY));
-            put(CHARGE_TIMER3_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER3, Day.MONDAY));
-            put(CHARGE_TIMER3_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER3, Day.TUESDAY));
-            put(CHARGE_TIMER3_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER3, Day.WEDNESDAY));
-            put(CHARGE_TIMER3_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER3, Day.THURSDAY));
-            put(CHARGE_TIMER3_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER3, Day.FRIDAY));
-            put(CHARGE_TIMER3_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER3, Day.SATURDAY));
-            put(CHARGE_TIMER3_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER3, Day.SUNDAY));
+            put(CHARGE_TIMER1_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.MONDAY));
+            put(CHARGE_TIMER1_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.TUESDAY));
+            put(CHARGE_TIMER1_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.WEDNESDAY));
+            put(CHARGE_TIMER1_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.THURSDAY));
+            put(CHARGE_TIMER1_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.FRIDAY));
+            put(CHARGE_TIMER1_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.SATURDAY));
+            put(CHARGE_TIMER1_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER1, DayOfWeek.SUNDAY));
+            put(CHARGE_TIMER2_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.MONDAY));
+            put(CHARGE_TIMER2_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.TUESDAY));
+            put(CHARGE_TIMER2_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.WEDNESDAY));
+            put(CHARGE_TIMER2_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.THURSDAY));
+            put(CHARGE_TIMER2_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.FRIDAY));
+            put(CHARGE_TIMER2_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.SATURDAY));
+            put(CHARGE_TIMER2_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER2, DayOfWeek.SUNDAY));
+            put(CHARGE_TIMER3_DAY_MON, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.MONDAY));
+            put(CHARGE_TIMER3_DAY_TUE, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.TUESDAY));
+            put(CHARGE_TIMER3_DAY_WED, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.WEDNESDAY));
+            put(CHARGE_TIMER3_DAY_THU, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.THURSDAY));
+            put(CHARGE_TIMER3_DAY_FRI, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.FRIDAY));
+            put(CHARGE_TIMER3_DAY_SAT, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.SATURDAY));
+            put(CHARGE_TIMER3_DAY_SUN, new ChargeKeyDay(ProfileKey.TIMER3, DayOfWeek.SUNDAY));
         }
     };
 
@@ -177,20 +179,21 @@ public class VehicleHandler extends VehicleChannelHandler {
         // Refresh of Channels with cached values
         if (command instanceof RefreshType) {
             if (CHANNEL_GROUP_LAST_TRIP.equals(group)) {
-                lastTripCallback.onResponse(lastTripCache);
+                lastTripCache.ifPresent(lastTrip -> lastTripCallback.onResponse(lastTrip));
             } else if (CHANNEL_GROUP_LIFETIME.equals(group)) {
-                allTripsCallback.onResponse(allTripsCache);
+                allTripsCache.ifPresent(allTrips -> allTripsCallback.onResponse(allTrips));
             } else if (CHANNEL_GROUP_LAST_TRIP.equals(group)) {
-                lastTripCallback.onResponse(lastTripCache);
+                lastTripCache.ifPresent(lastTrip -> lastTripCallback.onResponse(lastTrip));
             } else if (CHANNEL_GROUP_LAST_TRIP.equals(group)) {
-                lastTripCallback.onResponse(lastTripCache);
+                lastTripCache.ifPresent(lastTrip -> lastTripCallback.onResponse(lastTrip));
             } else if (CHANNEL_GROUP_STATUS.equals(group)) {
-                vehicleStatusCallback.onResponse(vehicleStatusCache);
+                vehicleStatusCache.ifPresent(vehicleStatus -> vehicleStatusCallback.onResponse(vehicleStatus));
             } else if (CHANNEL_GROUP_CHARGE.equals(group)) {
-                chargeProfileEdit.ifPresentOrElse(profile -> updateChargeProfile(profile),
-                        () -> updateChargeProfileFromContent(chargeProfileCache));
+                chargeProfileEdit.ifPresentOrElse(profileEdit -> updateChargeProfile(profileEdit),
+                        () -> chargeProfileCache
+                                .ifPresent(profileCache -> updateChargeProfileFromContent(profileCache)));
             } else if (CHANNEL_GROUP_VEHICLE_IMAGE.equals(group)) {
-                imageCallback.onResponse(imageCache);
+                imageCache.ifPresent(image -> imageCallback.onResponse(image));
             }
             // Check for Channel Group and corresponding Actions
         } else if (CHANNEL_GROUP_REMOTE.equals(group)) {
@@ -356,64 +359,69 @@ public class VehicleHandler extends VehicleChannelHandler {
     }
 
     public void getData() {
-        if (proxy.isPresent() && configuration.isPresent()) {
-            if (!legacyMode) {
-                proxy.get().requestVehcileStatus(configuration.get(), vehicleStatusCallback);
-            } else {
-                proxy.get().requestLegacyVehcileStatus(configuration.get(), oldVehicleStatusCallback);
-            }
-            addCallback(vehicleStatusCallback);
-            if (isSupported(Constants.STATISTICS)) {
-                proxy.get().requestLastTrip(configuration.get(), lastTripCallback);
-                proxy.get().requestAllTrips(configuration.get(), allTripsCallback);
-                addCallback(lastTripCallback);
-                addCallback(allTripsCallback);
-            }
-            if (isSupported(Constants.LAST_DESTINATIONS)) {
-                proxy.get().requestDestinations(configuration.get(), destinationCallback);
-                addCallback(destinationCallback);
-            }
-            if (isElectric) {
-                proxy.get().requestChargingProfile(configuration.get(), chargeProfileCallback);
-                addCallback(chargeProfileCallback);
-            }
-            synchronized (imageProperties) {
-                if (!imageCache.isPresent() && !imageProperties.failLimitReached()) {
-                    proxy.get().requestImage(configuration.get(), imageProperties, imageCallback);
-                    addCallback(imageCallback);
+        proxy.ifPresentOrElse(prox -> {
+            configuration.ifPresentOrElse(config -> {
+                if (!legacyMode) {
+                    prox.requestVehcileStatus(config, vehicleStatusCallback);
+                } else {
+                    prox.requestLegacyVehcileStatus(config, oldVehicleStatusCallback);
                 }
-            }
-        } else {
+                addCallback(vehicleStatusCallback);
+                if (isSupported(Constants.STATISTICS)) {
+                    prox.requestLastTrip(config, lastTripCallback);
+                    prox.requestAllTrips(config, allTripsCallback);
+                    addCallback(lastTripCallback);
+                    addCallback(allTripsCallback);
+                }
+                if (isSupported(Constants.LAST_DESTINATIONS)) {
+                    prox.requestDestinations(config, destinationCallback);
+                    addCallback(destinationCallback);
+                }
+                if (isElectric) {
+                    prox.requestChargingProfile(config, chargeProfileCallback);
+                    addCallback(chargeProfileCallback);
+                }
+                synchronized (imageProperties) {
+                    if (!imageCache.isPresent() && !imageProperties.failLimitReached()) {
+                        prox.requestImage(config, imageProperties, imageCallback);
+                        addCallback(imageCallback);
+                    }
+                }
+            }, () -> {
+                logger.warn("ConnectedDrive Configuration isn't present");
+            });
+        }, () -> {
             logger.warn("ConnectedDrive Proxy isn't present");
-        }
+        });
     }
 
     private synchronized void addCallback(ResponseCallback rc) {
-        if (callbackCounter.isPresent()) {
-            callbackCounter.get().add(rc);
-        }
+        callbackCounter.ifPresent(counter -> counter.add(rc));
     }
 
     private synchronized void removeCallback(ResponseCallback rc) {
-        if (callbackCounter.isPresent()) {
-            callbackCounter.get().remove(rc);
+        callbackCounter.ifPresent(counter -> {
+            counter.remove(rc);
             // all necessary callbacks received => print and set to empty
-            if (callbackCounter.get().isEmpty()) {
+            if (counter.isEmpty()) {
                 logFingerPrint();
                 callbackCounter = Optional.empty();
             }
-        }
+        });
     }
 
     private void logFingerPrint() {
+        final String vin = configuration.map(config -> config.vin).orElse("");
         logger.debug("###### BMW ConnectedDrive Binding - Vehicle Troubleshoot Fingerprint Data - BEGIN ######");
         logger.debug("### Discovery Result ###");
-        logger.debug("{}", bridgeHandler.get().getDiscoveryFingerprint());
-        if (vehicleStatusCache.isPresent()) {
+        bridgeHandler.ifPresent(handler -> {
+            logger.debug("{}", handler.getDiscoveryFingerprint());
+        });
+        vehicleStatusCache.ifPresentOrElse(vehicleStatus -> {
             logger.debug("### Vehicle Status ###");
 
             // Anonymous data for VIN and Position
-            VehicleStatusContainer container = Converter.getGson().fromJson(vehicleStatusCache.get(),
+            VehicleStatusContainer container = Converter.getGson().fromJson(vehicleStatus,
                     VehicleStatusContainer.class);
             if (container != null) {
                 VehicleStatus status = container.vehicleStatus;
@@ -427,33 +435,32 @@ public class VehicleHandler extends VehicleChannelHandler {
                 }
             }
             logger.debug("{}", Converter.getGson().toJson(container));
-        } else {
+        }, () -> {
             logger.debug("### Vehicle Status Empty ###");
-        }
-        if (lastTripCache.isPresent()) {
+        });
+        lastTripCache.ifPresentOrElse(lastTrip -> {
             logger.debug("### Last Trip ###");
-            logger.debug("{}", lastTripCache.get().replaceAll(configuration.get().vin, Constants.ANONYMOUS));
-        } else {
+            logger.debug("{}", lastTrip.replaceAll(vin, Constants.ANONYMOUS));
+        }, () -> {
             logger.debug("### Last Trip Empty ###");
-        }
-        if (allTripsCache.isPresent()) {
+        });
+        allTripsCache.ifPresentOrElse(allTrips -> {
             logger.debug("### All Trips ###");
-            logger.debug("{}", allTripsCache.get().replaceAll(configuration.get().vin, Constants.ANONYMOUS));
-        } else {
+            logger.debug("{}", allTrips.replaceAll(vin, Constants.ANONYMOUS));
+        }, () -> {
             logger.debug("### All Trips Empty ###");
-        }
+        });
         if (isElectric) {
-            if (chargeProfileCache.isPresent()) {
+            chargeProfileCache.ifPresentOrElse(chargeProfile -> {
                 logger.debug("### Charge Profile ###");
-                logger.debug("{}", chargeProfileCache.get().replaceAll(configuration.get().vin, Constants.ANONYMOUS));
-            } else {
+                logger.debug("{}", chargeProfile.replaceAll(vin, Constants.ANONYMOUS));
+            }, () -> {
                 logger.debug("### Charge Profile Empty ###");
-            }
+            });
         }
-        if (destinationCache.isPresent()) {
+        destinationCache.ifPresentOrElse(destination -> {
             logger.debug("### Charge Profile ###");
-            DestinationContainer container = Converter.getGson().fromJson(destinationCache.get(),
-                    DestinationContainer.class);
+            DestinationContainer container = Converter.getGson().fromJson(destination, DestinationContainer.class);
             if (container != null) {
                 if (container.destinations != null) {
                     container.destinations.forEach(entry -> {
@@ -469,15 +476,15 @@ public class VehicleHandler extends VehicleChannelHandler {
             } else {
                 logger.debug("### Destinations Empty ###");
             }
-        } else {
+        }, () -> {
             logger.debug("### Charge Profile Empty ###");
-        }
-        if (rangeMapCache.isPresent()) {
+        });
+        rangeMapCache.ifPresentOrElse(rangeMap -> {
             logger.debug("### Range Map ###");
-            logger.debug("{}", rangeMapCache.get().replaceAll(configuration.get().vin, Constants.ANONYMOUS));
-        } else {
+            logger.debug("{}", rangeMap.replaceAll(vin, Constants.ANONYMOUS));
+        }, () -> {
             logger.debug("### Range Map Empty ###");
-        }
+        });
         logger.debug("###### BMW ConnectedDrive Binding - Vehicle Troubleshoot Fingerprint Data - END ######");
     }
 
@@ -495,20 +502,20 @@ public class VehicleHandler extends VehicleChannelHandler {
             }
         }
         // if cache is empty give it a try one time to collected Troubleshoot data
-        if (!lastTripCache.isPresent() || !allTripsCache.isPresent() || !destinationCache.isPresent()) {
+        if (lastTripCache.isEmpty() || allTripsCache.isEmpty() || destinationCache.isEmpty()) {
             return true;
         } else {
             return false;
         }
     }
 
-    public void updateRemoteExecutionStatus(String service, String status) {
-        if (service.equals(RemoteService.CHARGING_CONTROL.toString())
-                && status.equals(ExecutionState.EXECUTED.toString())) {
+    public void updateRemoteExecutionStatus(@Nullable String service, String status) {
+        if (RemoteService.CHARGING_CONTROL.toString().equals(service)
+                && ExecutionState.EXECUTED.toString().equals(status)) {
             saveChargeProfileSent();
         }
-        updateState(remoteStateChannel, StringType
-                .valueOf(Converter.toTitleCase(new StringBuilder(service).append(" ").append(status).toString())));
+        updateState(remoteStateChannel, StringType.valueOf(Converter.toTitleCase(
+                new StringBuilder(service == null ? "-" : service).append(" ").append(status).toString())));
     }
 
     public Optional<VehicleConfiguration> getConfiguration() {
@@ -528,10 +535,12 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class ChargeProfilesCallback implements StringResponseCallback {
         @Override
-        public void onResponse(Optional<String> content) {
-            chargeProfileCache = content;
-            if (chargeProfileEdit.isEmpty()) {
-                updateChargeProfileFromContent(chargeProfileCache);
+        public void onResponse(@Nullable String content) {
+            if (content != null) {
+                chargeProfileCache = Optional.of(content);
+                if (chargeProfileEdit.isEmpty()) {
+                    updateChargeProfileFromContent(content);
+                }
             }
             removeCallback(this);
         }
@@ -550,8 +559,8 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class RangeMapCallback implements StringResponseCallback {
         @Override
-        public void onResponse(Optional<String> content) {
-            rangeMapCache = content;
+        public void onResponse(@Nullable String content) {
+            rangeMapCache = Optional.ofNullable(content);
             removeCallback(this);
         }
 
@@ -570,10 +579,10 @@ public class VehicleHandler extends VehicleChannelHandler {
     public class DestinationsCallback implements StringResponseCallback {
 
         @Override
-        public void onResponse(Optional<String> content) {
-            destinationCache = content;
-            if (content.isPresent()) {
-                DestinationContainer dc = Converter.getGson().fromJson(content.get(), DestinationContainer.class);
+        public void onResponse(@Nullable String content) {
+            destinationCache = Optional.ofNullable(content);
+            if (content != null) {
+                DestinationContainer dc = Converter.getGson().fromJson(content, DestinationContainer.class);
                 if (dc != null) {
                     if (dc.destinations != null) {
                         updateDestinations(dc.destinations);
@@ -597,11 +606,11 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class ImageCallback implements ByteResponseCallback {
         @Override
-        public void onResponse(Optional<byte[]> content) {
-            imageCache = content;
-            if (content.isPresent()) {
-                String contentType = HttpUtil.guessContentTypeFromData(content.get());
-                updateState(imageChannel, new RawType(content.get(), contentType));
+        public void onResponse(byte[] content) {
+            if (content.length > 0) {
+                imageCache = Optional.of(content);
+                String contentType = HttpUtil.guessContentTypeFromData(content);
+                updateState(imageChannel, new RawType(content, contentType));
             } else {
                 synchronized (imageProperties) {
                     imageProperties.failed();
@@ -626,10 +635,10 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class AllTripsCallback implements StringResponseCallback {
         @Override
-        public void onResponse(Optional<String> content) {
-            if (content.isPresent()) {
-                allTripsCache = content;
-                AllTripsContainer atc = Converter.getGson().fromJson(content.get(), AllTripsContainer.class);
+        public void onResponse(@Nullable String content) {
+            if (content != null) {
+                allTripsCache = Optional.of(content);
+                AllTripsContainer atc = Converter.getGson().fromJson(content, AllTripsContainer.class);
                 if (atc != null) {
                     AllTrips at = atc.allTrips;
                     if (at != null) {
@@ -654,10 +663,10 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class LastTripCallback implements StringResponseCallback {
         @Override
-        public void onResponse(Optional<String> content) {
-            if (content.isPresent()) {
-                lastTripCache = content;
-                LastTripContainer lt = Converter.getGson().fromJson(content.get(), LastTripContainer.class);
+        public void onResponse(@Nullable String content) {
+            if (content != null) {
+                lastTripCache = Optional.of(content);
+                LastTripContainer lt = Converter.getGson().fromJson(content, LastTripContainer.class);
                 if (lt != null) {
                     LastTrip trip = lt.lastTrip;
                     if (trip != null) {
@@ -701,12 +710,11 @@ public class VehicleHandler extends VehicleChannelHandler {
         }
 
         @Override
-        public void onResponse(Optional<String> content) {
-            if (content.isPresent()) {
+        public void onResponse(@Nullable String content) {
+            if (content != null) {
                 setThingStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, Constants.EMPTY);
-                vehicleStatusCache = content;
-                VehicleStatusContainer status = Converter.getGson().fromJson(content.get(),
-                        VehicleStatusContainer.class);
+                vehicleStatusCache = Optional.of(content);
+                VehicleStatusContainer status = Converter.getGson().fromJson(content, VehicleStatusContainer.class);
                 if (status != null) {
                     VehicleStatus vStatus = status.vehicleStatus;
                     if (vStatus == null) {
@@ -749,12 +757,12 @@ public class VehicleHandler extends VehicleChannelHandler {
     @NonNullByDefault({})
     public class LegacyVehicleStatusCallback implements StringResponseCallback {
         @Override
-        public void onResponse(Optional<String> content) {
-            if (content.isPresent()) {
-                VehicleAttributesContainer vac = Converter.getGson().fromJson(content.get(),
+        public void onResponse(@Nullable String content) {
+            if (content != null) {
+                VehicleAttributesContainer vac = Converter.getGson().fromJson(content,
                         VehicleAttributesContainer.class);
                 if (vac != null) {
-                    vehicleStatusCallback.onResponse(Optional.of(vac.transform()));
+                    vehicleStatusCallback.onResponse(vac.transform());
                 }
             }
         }
@@ -829,7 +837,7 @@ public class VehicleHandler extends VehicleChannelHandler {
                 editTimeout = Optional.of(scheduler.schedule(() -> {
                     editTimeout = Optional.empty();
                     chargeProfileEdit = Optional.empty();
-                    updateChargeProfileFromContent(chargeProfileCache);
+                    chargeProfileCache.ifPresent(content -> updateChargeProfileFromContent(content));
                 }, 5, TimeUnit.MINUTES));
             } else {
                 logger.info("unexpected command {} not processed", command.toFullString());
@@ -846,7 +854,7 @@ public class VehicleHandler extends VehicleChannelHandler {
             chargeProfileCache = Optional.of(sent);
             chargeProfileSent = Optional.empty();
             chargeProfileEdit = Optional.empty();
-            updateChargeProfileFromContent(chargeProfileCache);
+            chargeProfileCache.ifPresent(content -> updateChargeProfileFromContent(content));
         });
     }
 
